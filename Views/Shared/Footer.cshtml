@@ -115,7 +115,8 @@
 </ul>
 
 <button id="show-support-button" type="button" class="btn btn-sm btn-primary" data-bind="click: createRoom"> Chat With Support</button>
-<div style="width:300px;display:none;max-height: 300px; overflow-y: auto;width:370px" id="support-div">
+<div style="width:300px;display:none;max-height: 400px; overflow-y: auto;width:370px; background-color:darkgray;z-index:1000; border-radius:20px; padding: 10px;" id="support-div">
+
 
     <div class="messages-container position-relative" style="width:300px">
         <div class="no-messages-info" data-bind="if: chatMessages().length == 0">There are no messages.</div>
