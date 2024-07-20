@@ -1,0 +1,262 @@
+﻿@using Microsoft.AspNetCore.Http
+
+@inject IHttpContextAccessor HttpContextAccessor
+@model Group5.Models.StationeryItem
+@* @model IEnumerable<Group5.ViewModels.StationeryItemViewModel> *@
+
+@{
+    ViewData["Title"] = "DetailStationery";
+}
+<style>
+    .card {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        border-radius: 30px;
+        padding: 10px;
+        box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+        width: 100%;
+        height: 480px;
+        background: #12c2e9; /* fallback for old browsers */
+        background: -webkit-linear-gradient(to right, #f64f59, #c471ed, #12c2e9); /* Chrome 10-25, Safari 5.1-6 */
+        background: linear-gradient(to right, #f64f59, #c471ed, #12c2e9); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    }
+
+    .left-container {
+        background: #000000;
+        background: -webkit-linear-gradient(to right, #434343, #000000);
+        background: linear-gradient(to right, #434343, #000000);
+        flex: 1;
+        max-width: 30%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 430px;
+        padding: 10px;
+        margin: 30px;
+        border-radius: 20px;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    }
+
+    .right-container {
+        background: #000000;
+        background: -webkit-linear-gradient(to left, #434343, #000000);
+        background: linear-gradient(to left, #434343, #000000);
+        flex: 1;
+        max-width: 70%;
+        height: 430px;
+        padding: 10px;
+        margin: 20px;
+        border-radius: 30px;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    }
+
+    .avtDetail {
+        width: 200px;
+        height: 200px;
+        max-width: 200px;
+        border-radius: 50%;
+        margin: 10px;
+        object-fit: cover;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    }
+
+    h2 {
+        font-size: 24px;
+        margin-bottom: 5px;
+    }
+
+    h3 {
+        text-align: center;
+        font-size: 24px;
+        margin-bottom: 5px;
+    }
+
+    .gradienttext {
+        background-image: linear-gradient(to right, #ee00ff 0%, #fbff00 100%);
+        color: transparent;
+        -webkit-background-clip: text;
+    }
+
+    table {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 280px;
+        border-collapse: collapse;
+    }
+
+    td {
+        padding: 10px;
+        border: none;
+        border-radius: 20px;
+        color: white;
+    }
+
+        td:first-child {
+            font-weight: bold;
+        }
+</style>
+
+<div class="card">
+    <div class="left-container">
+ 
+        <img src="/images/@Model.ImageUrl" />
+            <h2 class="gradienttext">@Model.Name</h2>
+        <br />
+    </div>
+
+    <div class="right-container">
+        <br />
+        <h3 class="gradienttext">Stationery Details</h3>
+        <br />
+        <br />
+  
+        <table>
+            @* <tr>
+                <td>Name :</td>
+                <td>@Html.DisplayFor(model => model.Name)</td>
+            </tr> *@
+            <tr>
+                <td>Description :</td>
+                <td>@Html.DisplayFor(model => model.Description)</td>
+            </tr>
+            <tr>
+                <td>Price :</td>
+                <td>$@Html.DisplayFor(model => model.Price)</td>
+            </tr>
+            <tr>
+                <td>Quantity :</td>
+                <td>@Html.DisplayFor(model => model.Quantity)</td>
+            </tr>
+            <tr>
+                <td>Type Of Statiionery :</td>
+                <td>@Html.DisplayFor(model => model.TypeOfQuantity)</td>
+            </tr>
+            <tr>
+                <td>Category :</td>
+                <td>@Html.DisplayFor(model => model.Categories.Name)</td>
+            </tr>
+            <tr>
+                <td>Brand :</td>
+                <td>@Html.DisplayFor(model => model.Brand.Name)</td>
+            </tr>
+     
+
+
+        </table>
+    </div>
+</div>
+<div>
+    @* <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> | *@
+    <a asp-action="Index" class="btn btn-danger confirm">Back to List</a>
+    <div class="cart-button d-flex" style="text-align:center">
+        <a id="requestLink_@Model.Id" data-id="@Model.Id" class="ajax-add-to-cart btn btn-medium btn-black">REQUEST</a>
+        <input type="number" oninput="updateLink(this, '@Model.Id')" name="quantity" placeholder="Quantity" class="form-control" min="1" max="100" value="1" hidden>
+    </div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+@section script
+    {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        $(document).ready(function () {
+            $(".ajax-add-to-cart").click(function () {
+                $.ajax({
+                    url: "/Cart/CreateCartItem",
+                    data: {
+                        id: $(this).data("id"),
+                        quantity: $(this).closest('.cart-button').find('input[name="quantity"]').val(),
+                        type: "ajax"
+                    },
+                    success: function (data) {
+                        console.log(data);
+                        var existingCartItem = $(".header-cart-wrapitem").find("#cartItem_" + data.newItemId);
+                        updateTotal(data.total);
+                        if (existingCartItem.length > 0) {
+                            // Update the quantity if the item is already in the cart
+                            var newQuantity = parseInt(data.newItemQuantity);
+                            existingCartItem.find(".header-cart-item-info").text(newQuantity + ' X $' + data.newItemPrice);
+                        } else {
+                            // Add a new item to the cart
+                            var newItemHtml =
+                                '<li class="header-cart-item flex-w flex-t m-b-12" id="cartItem_' + data.newItemId + '">' +
+                                '<a class="delete-cart-item-head" data-id="' + data.newItemId + '">' +
+                                '<div class="header-cart-item-img">' +
+                                '<img src="/images/' + data.newItemImage + '" alt="IMG">' + // Updated path here
+                                '</div>' +
+                                '</a>' +
+                                '<div class="header-cart-item-txt p-t-8">' +
+                                '<a class="header-cart-item-name m-b-18 hov-cl1 trans-04">' + data.newItemName + '</a>' +
+                                '<span class="header-cart-item-info">' + data.newItemQuantity + ' X $' + data.newItemPrice + '</span>' +
+                                '</div>' +
+                                '</li>';
+
+                            $(".header-cart-wrapitem").append(newItemHtml);
+                        }
+                        Swal.fire({
+                            position: "top-end",
+                            icon: "success",
+                            title: "Add Item To Request List Successfully!",
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+
+
+
+                        $("#cartcount").html(data.items);
+                    },
+                    error: function () {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Can't Add to Request List",
+                            text: "Please Try Later",
+                            footer: '<a href="#">Why do I have this issue?</a>',
+                            timer: 1500
+                        });
+                    }
+                });
+                function updateTotal(total) {
+                    // Update the UI with the new total
+                    $("#total").text(total);
+                    $("#totalheader").text(total);
+                }
+            });
+        });
+    </script>
+
+    <script>
+        function updateLink(input, itemId) {
+            var quantity = input.value;
+            // Set quantity to 1 if not found or invalid
+
+            var requestLink = $("#requestLink_" + itemId);
+
+            if (quantity <= 0 || quantity > 100) {
+                requestLink.addClass("disabled");
+                requestLink.attr("disabled", true);
+            } else {
+                requestLink.removeClass("disabled");
+                requestLink.removeAttr("disabled");
+            }
+        }
+
+        $(document).ready(function () {
+            // Disable link on page load if quantity is initially invalid
+            $(".cart-button input").each(function () {
+                var itemId = $(this).data("id");
+                updateLink(this, itemId);
+            });
+
+            // Prevent default action of disabled links
+            $(".ajax-add-to-cart.disabled").on("click", function (e) {
+                e.preventDefault();
+            });
+        });
+    </script>
+}

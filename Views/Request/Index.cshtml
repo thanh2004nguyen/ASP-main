@@ -1,0 +1,226 @@
+﻿@model IEnumerable<Group5.Models.CartItem>
+@using Group5.Data
+@{
+    ViewData["Title"] = "Index";
+    var user = ViewData["user"] as Employee;
+     var total = ViewData["total"];
+    var cartitem = ViewData["loginCartItem"] as List<CartItem>;
+}
+
+@* <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"> *@
+<link rel="stylesheet" href="~/css/RequestConfirm.css">
+  
+   <style>
+    .cancel-button {
+        font-size: 12px;
+        font-weight:bold;
+        display: inline-block;
+        padding: 12px 25px;
+        background-color: cadetblue;
+        color: black;
+        text-decoration: none;
+        border: 1px solid yellow;
+        border-radius: 4px;
+        transition: background-color 0.3s;
+    }
+
+        .cancel-button:hover {
+            background-color: red;
+            color: white;
+            border-color: red;
+        }
+.basket-body {
+    max-height: 600px; /* Set your preferred maximum height here */
+    overflow-y: auto;
+}
+
+.product {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px; /* Adjust as needed */
+}
+
+.product-image img {
+    max-width: 100%;
+    height: auto;
+    margin-left: 0px; /* Adjust as needed */
+}
+
+   </style>
+<div class="alert alert-danger message" style="color: red;font-size:30px"></div>
+
+@if (TempData.ContainsKey("success"))
+{
+    <div class="alert alert-success">
+        @TempData["success"]
+    </div>
+}
+
+@if (TempData.ContainsKey("error"))
+{
+    <div class="alert alert-danger">
+        @TempData["error"]
+    </div>
+}
+<div class="container-fluid background">
+    <div class="row padding-top-20" >
+        <div class="col-12 col-sm-12 col-md-10 col-lg-10 col-xl-8 offset-md-1 offset-lg-1 offset-xl-2 padding-horizontal-40" style="width:1000px" >
+            <div class="row" >
+                <div class="col-12 main-wrapper">
+                    <div class="row">
+                        <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                            <div id="template" class="row panel-wrapper">
+                                <div class="col-12 panel-header basket-header">
+                                    <div class="row">
+                                        <div class="col-6 basket-title">
+                                            <span class="description"></span><br><span class="emphasized" style="font-size:25px">Request Summary</span>
+                                        </div>
+                                      
+                                    </div>
+                                    <div class="row column-titles">
+                                        <div class="col-2 align-center"><span>Photo</span></div>
+                                        <div class="col-5 align-center"><span>Name</span></div>
+                                        <div class="col-2 align-center"><span>Quantity</span></div>
+                                        <div class="col-3 align-right"><span>Price</span></div>
+                                    </div>
+                                </div>
+                         
+                                    <div class="col-12 panel-body basket-body">
+                            @foreach (var item in cartitem!)
+                            {
+                                <div class="row product">
+                                    <div class="product-image col-2"><img src="~/images/@item.StationeryItem!.ImageUrl"></div>
+                                    <div class="col-5">
+                                        <span class="additional" style="font-size: 18px; color: #333;">@item.StationeryItem.Name</span>
+                                    </div>
+                                    <div class="col-2 align-right">
+                                        <span class="sub" style="font-size: 18px; color: #555;">@item.Quantity</span>
+                                    </div>
+                                    <div class="col-3 align-right">
+                                        <span class="sub" style="font-size: 18px; color: #777;">$ @item.StationeryItem.Price</span>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                                
+                                <div class="col-9 panel-footer basket-footer">
+                                 
+                                    <div class="row">
+                                       
+                                        <div class="col-4 align-center"><span class="emphasized"></span></div>
+                             
+                                     
+                                    </div>
+                                 
+                                    <div class="row">
+                                        <div class="col-8 align-center description"><div class="dive" style="font-size: 18px">Total</div></div>
+                                        <div class="col-4 align-center"><span class="very emphasized">$ @total</span></div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                            <div class="row panel-wrapper">
+                                <div class="col-12 panel-header creditcard-header">
+                                    <div class="row">
+                                        <div class="col-12 creditcard-title">
+                                            <span class="description"></span><br><span class="emphasized" style="font-size:25px">Employee Information</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <form asp-action="CreateRequet" asp-controller="Request" method="post">
+                                <div class="col-12 panel-body creditcard-body">
+                                        <fieldset>
+                                            <label for="card-name" style="color:cadetblue;font-size:20px">FullName</label>
+                              
+                                            <i class="notika-icon notika-support input-lg"></i>
+                                            <div style="font-size:18px">@user!.FullName</div>
+                                            <br />
+                                        </fieldset>
+                                        <fieldset>
+                                            <label  style="color:cadetblue;font-size:20px">Department</label>
+                                      
+                                            <i class="notika-icon notika-map input-lg"></i>
+                                            <div style="font-size:18px">@user.Departments!.Name</div>
+                                            <br />
+                                        </fieldset>
+                             
+                                                     <fieldset>
+                                            <label for="card-number" style="color:cadetblue;font-size:20px">Position</label>
+                                   
+                                            <i class="notika-icon notika-star"></i> <i class="notika-icon notika-star"></i>  <i class="notika-icon notika-star"></i>
+                                            <div style="font-size:18px">@user.EmployeePositions!.Position</div>
+                                            <br />
+                                        </fieldset>
+
+                                                        <fieldset>
+                                            <label for="card-number" style="color:cadetblue;font-size:20px">Max Request Amount</label>
+                                   
+                                            <i class="notika-icon notika-star"></i> <i class="notika-icon notika-star"></i>  <i class="notika-icon notika-star"></i>
+
+                                            <div style="font-size:18px;color:red">You Unable To Make Request If Total More Than: <br /> $ @user.AmountRequestPerMonth </div>
+                                        </fieldset>
+                               
+                                </div>
+                                    <div class="col-12 panel-footer creditcard-footer" style="margin-bottom:50px" >
+                                        <div class="row">        
+                                            <div class="col-12 align-right">
+                                                <a asp-action="Index" asp-controller="Cart" class="cancel-button">CANCEL</a>
+                                                &nbsp;
+                                                <button type="submit" class="confirm">Confirm</button>
+                                        
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+  
+        <script>
+    $(document).ready(function () {
+        // Assuming you have a variable named 'maxRequestAmount' with the maximum allowed amount
+        var maxRequestAmount = @user.AmountRequestPerMonth;
+
+        // Assuming you have a variable named 'totalAmount' with the calculated total amount
+        var totalAmount = @total;
+        console.log(maxRequestAmount);
+            console.log(totalAmount);
+        // Function to update button state and display message
+        function updateButtonState() {
+            if (totalAmount > maxRequestAmount) {
+                // Total exceeds the maximum allowed amount
+                $(".confirm").prop("disabled", true); // Disable the "Confirm" button
+                $(".message").text("You Request Too Much!!").show(); // Show the message
+            } else {
+                // Total is within the allowed amount
+                $(".confirm").prop("disabled", false); // Enable the "Confirm" button
+                $(".message").hide(); // Hide the message
+            }
+        }
+
+        // Call the function on page load
+        updateButtonState();
+
+        // Assuming you have an input field for quantity, update the state on quantity change
+        $('input[name="quantity"]').on('input', function () {
+            // Update the total amount based on the new quantity (replace this with your logic)
+            totalAmount = calculateTotalAmount();
+
+            // Call the function to update the button state
+            updateButtonState();
+        });
+    });
+</script>
+ 
+

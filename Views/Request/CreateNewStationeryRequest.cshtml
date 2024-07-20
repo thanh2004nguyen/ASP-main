@@ -1,0 +1,141 @@
+﻿@model Group5.ViewModels.NewStationeryRequestDto
+@using Group5.Data
+@{
+    ViewData["Title"] = "CreateNewStationeryRequest";
+    var user = ViewData["user"] as Employee;
+}
+
+<script>
+
+    // Validate name
+    $(document).ready(function () {
+        $('#name').blur(function (event) {
+            var name = $(this).val();
+            //  check name is required
+            if (!name) {
+                $('#name-error').html('Name required');
+                $("#name-error").css("color", "red");
+                //  check do dai cua name>3
+            } else if (name.length < 3) {
+                $('#name-error').html('Name must be at least 3 characters long.');
+                $("#name-error").css("color", "red");
+            }
+
+            else {
+                $("#name-error").html("You can use this Name");
+                $("#name-error").css("color", "blue");
+            }
+        });
+    });
+
+    $(document).ready(function () {
+        $('#quantity').blur(function (event) {
+            var name = $(this).val();
+            //  check name is required
+            if (!name) {
+                $('#quantity-error').html('Quantity required');
+                $("#quantity-error").css("color", "red");
+                //  check do dai cua name>3
+            } 
+        });
+    });
+
+
+    $(document).ready(function () {
+        $('#price').blur(function (event) {
+            var name = $(this).val();
+            //  check name is required
+            if (!name) {
+                $('#price-error').html('Price required');
+                $("#price-error").css("color", "red");
+                //  check do dai cua name>3
+            }
+        });
+    });
+</script>
+
+
+
+@if (TempData.ContainsKey("message"))
+{
+    <div class="alert alert-success">
+        @TempData["message"]
+    </div>
+}
+
+@if (TempData.ContainsKey("error"))
+{
+    <div class="alert alert-danger">
+        @TempData["error"]
+    </div>
+}
+
+<h1 style="text-align:center">Request For New Stationery </h1>
+<hr />
+
+<div class="row" style="display:flex;justify-content:space-between;align-items:center">
+    <div class="col-md-4">
+        <form asp-action="CreateNewStationeryRequest" method="POST" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="ItemName" class="control-label"></label>
+                <input asp-for="ItemName" id="name" class="form-control" />
+           @*      <span asp-validation-for="ItemName" class="text-danger"></span> *@
+                <div id="name-error"></div>
+            </div>
+            <div class="form-group">
+                <label asp-for="Description" class="control-label"></label>
+                <textarea asp-for="Description" class="form-control"></textarea>
+           @*      <span asp-validation-for="Description" class="text-danger"></span> *@
+            </div>
+            <div class="form-group">
+                <label asp-for="Quantity" class="control-label"></label>
+                <input asp-for="Quantity" class="form-control" id="quantity" oninput="calculateTotal()" />
+@*                 <span asp-validation-for="Quantity" class="text-danger"></span> *@
+                <div id="quantity-error"></div>
+            </div>
+
+            <div class="form-group">
+       
+                <input asp-for="Amount" class="form-contron Amount" id="Amount" value="@user!.AmountRequestPerMonth" hidden />
+        
+            </div>
+
+
+            <div class="form-group">
+                <label class="control-label">Benchmark price</label>
+                <input asp-for="Price"  class="form-control" id="price" oninput="calculateTotal()" />
+            @*     <span asp-validation-for="Price" class="text-danger"></span> *@
+                <div id="price-error"></div>
+            </div>
+            <div class="form-group">
+                <label asp-for="Photo" class="control-label"></label>
+                <input asp-for="Photo" class="form-control" />
+                <span asp-validation-for="Photo" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label class="control-label">Total</label>
+                <input asp-for="Total" class="form-control" id="total" readonly />
+                <input class="form-control Amount" id="Amount" value="0" type="hidden" />
+            </div>
+            <div class="form-group">
+                <button type="submit"  class="btn btn-danger confirm">SUBMIT</button> <br />
+                <span style="font-size:18px;color:darkslateblue">You Have  <span style="font-weight:Bold">$@user!.AmountRequestPerMonth</span>  For Request  This Month </span>
+           
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index" asp-controller="Home" class="btn btn-info">BACK TO HOME</a>
+</div>
+
+<script>
+    function calculateTotal() {
+        var quantity = parseFloat(document.getElementById('quantity').value) || 0;
+        var price = parseFloat(document.getElementById('price').value) || 0;
+        var total = quantity * price;
+        document.getElementById('total').value = total.toFixed(1); 
+    }
+</script>

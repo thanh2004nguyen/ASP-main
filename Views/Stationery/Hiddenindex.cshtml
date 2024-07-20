@@ -1,0 +1,125 @@
+﻿@using Microsoft.AspNetCore.Http
+
+@inject IHttpContextAccessor HttpContextAccessor
+
+@model IEnumerable<Group5.ViewModels.StationeryItemViewModel>
+@* @model IEnumerable<Group5.Models.StationeryItem> *@
+
+@{
+    ViewData["Title"] = "Hiddenindex";
+    var total = ViewData["total"];
+}
+@if (TempData.ContainsKey("success"))
+{
+    <div class="alert alert-success" style="font-size:25px">
+        @TempData["success"]
+    </div>
+}
+
+@if (TempData.ContainsKey("error"))
+{
+    <div class="alert alert-danger">
+        @TempData["error"]
+    </div>
+}
+@if (TempData.ContainsKey("message"))
+{
+    <div class="alert alert-danger">
+        @TempData["message"]
+    </div>
+}
+<h1 style="text-align:center">Hidden Stationery</h1>
+
+<table class="table table-cl" id="hidden">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            
+            <th>
+                @Html.DisplayNameFor(model => model.Price)
+            </th>
+            
+            <th>
+                @Html.DisplayNameFor(model => model.Quantity)
+            </th>
+            <th>
+                @* @Html.DisplayNameFor(model => model.TypeOfQuantity) *@Type Of Stationery
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Categories)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Brand)
+            </th>
+            
+            <th>
+                @* @Html.DisplayNameFor(model => model.CreatedAt) *@Create Date
+            </th>
+            
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+           
+            <td>
+                @Html.DisplayFor(modelItem => item.Price)
+            </td>
+            
+            <td>
+                @Html.DisplayFor(modelItem => item.Quantity)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TypeOfQuantity)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Categories.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Brand.Name)
+            </td>
+            
+            <td>
+                @Html.DisplayFor(modelItem => item.CreatedAt)
+            </td>
+            
+            <td>
+                    <a asp-action="EditHiddenStationery" asp-route-id="@item.Id" class="btn btn-success">UnHide</a> |
+                    <a asp-action="DetailSta" asp-route-id="@item.Id" class="btn btn-info">Details</a>
+                    
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // Function to load data using AJAX
+        function loadDataByCategory(category) {
+            $.ajax({
+                url: '@Url.Action("GetStationeryByCategory", "Stationery")',
+                type: 'GET',
+                data: { category: category },
+                success: function (data) {
+                    console.log(data);
+
+                    $('#StationeryItem tbody').html(data);
+                },
+                error: function () {
+                    alert('Error loading data.');
+                }
+            });
+        }
+        $(document).on('click', '.categoryBtn', function () {
+            var category = $(this).data('category');
+            loadDataByCategory(category);
+        });
+    });
+</script>

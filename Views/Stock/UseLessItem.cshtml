@@ -1,0 +1,46 @@
+﻿@model IEnumerable<Group5.Models.UseLessItem>
+
+@{
+    ViewData["Title"] = "UseLessItem";
+}
+
+<p>
+    <a class="btn btn-danger confirm" style="width:220px;height:45px;font-size:20px" asp-action="CreateULessLevel" asp-controller="Stock">Create New</a>
+</p>
+<h1 style="text-align:center">List StockLevel</h1>
+<div class="row" style="display:flex;justify-content:space-between;align-items:center">
+
+    <table class="table table-cl" style="max-width:900px">
+        <thead>
+            <tr>
+                <th class="active">
+                    @Html.DisplayNameFor(model => model.StockLevel)
+                </th>
+                <th class="active">
+                    @Html.DisplayNameFor(model => model.MaxTime)
+                </th>
+                <th class="active">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.StockLevel)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.MaxTime)
+                    </td>
+                    <td>
+                        <a asp-action="UpdateUseLess" asp-controller="Stock" asp-route-id="@item.Id" class="btn btn-success btn-inf" role="button">Edit</a>
+                        <a asp-action="DeleteUless" asp-controller="Stock" asp-route-id="@item.Id" class="btn btn-danger btn-inf" role="button">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+
+

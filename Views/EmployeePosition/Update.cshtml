@@ -1,0 +1,129 @@
+﻿@model Group5.Models.EmployeePosition
+
+@{
+    ViewData["Title"] = "Update";
+}
+
+<style>
+
+    h1 {
+        color: green;
+    }
+
+    hr {
+        border-color: white;
+    }
+
+    .row {
+        margin: 20px;
+    }
+
+    form {
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        color: black;
+    }
+
+    input,
+    select,
+    button {
+        width: 100%;
+        padding: 10px;
+        margin-top: 5px;
+        margin-bottom: 15px;
+        box-sizing: border-box;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    button {
+        background-color: green;
+        color: white;
+        cursor: pointer;
+    }
+
+    .form-check {
+        display: flex;
+        align-items: center;
+    }
+
+    .form-check-input {
+        margin-right: 5px;
+    }
+
+    a {
+        color: white;
+    }
+
+    .role-container {
+        margin-bottom: 20px;
+    }
+
+    .role-checkbox {
+        display: flex;
+        width: 50%;
+        float: left;
+        margin-bottom: 10px;
+    }
+
+        .role-checkbox input {
+            margin-right: 5px;
+            width: 50%;
+            float: left;
+        }
+
+    .role-label {
+        color: black;
+    }
+</style>
+<h1 style="text-align:center">Update EmployeePosition</h1>
+
+
+
+<div class="row" style="display:flex;justify-content:space-between;align-items:center">
+    <div class="col-md-4">
+        <form asp-action="Update" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+             
+                <input asp-for="Id" class="form-control" hidden />
+             
+            </div>
+            <div class="form-group">
+                <label asp-for="Position" class="control-label"></label>
+                <input asp-for="Position" class="form-control" />
+                <span asp-validation-for="Position" class="text-danger"></span>
+            </div>
+       
+            <div class="form-group">
+                <label asp-for="MaxAmountPerMonth" class="control-label"></label>
+                <input asp-for="MaxAmountPerMonth" class="form-control" />
+                <span asp-validation-for="MaxAmountPerMonth" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Level" class="control-label"></label>
+                <input asp-for="Level" class="form-control" />
+                <span asp-validation-for="Level" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary btn-danger confirm">Update</button> 
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+

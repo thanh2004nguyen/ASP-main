@@ -1,0 +1,130 @@
+﻿@model IEnumerable<Group5.Models.Base.RequestBase>
+
+@{
+    ViewData["Title"] = "ListReceivedRequest";
+
+}
+
+<h1 style="text-align:center">List Received Request</h1>
+<div style="text-align:center">
+    <button class="btn btn-danger" style="width:200px;height:40px;font-size:18px;color:darkslateblue;font-weight:bold" id="NeedApprovalBtn">Need Approval</button>
+    <button class="btn btn-danger" style="width:200px;height:40px;font-size:18px;color:darkslateblue;font-weight:bold" id="otherBtn">Others</button>
+</div>
+
+
+<div id="imageModal" class="modal">
+    <span class="close" id="closeModal">&times;</span>
+    <img class="modal-content" id="modalImage">
+</div>
+<table class="table table-cl" id="ReceivedRequest">
+    <thead>
+        <tr>
+            <th class="active">
+                @Html.DisplayNameFor(model => model.Id)
+            </th>
+            <th class="active">
+                @Html.DisplayNameFor(model => model.CreatedAt)
+            </th>
+            <th class="active">
+                Request By
+            </th>
+            
+            <th class="active">
+                @Html.DisplayNameFor(model => model.Total)
+            </th>
+            <th class="active">
+                Status
+            </th>
+            <th class="active">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreatedAt)
+            </td>
+                <td>
+                    <img src="~/images/@item.RequestBy?.Avatar" class="zoomable-image" data-large="~/images/large/@item.RequestBy?.Avatar" style="width:40px; height:60px">
+                    @Html.DisplayFor(modelItem => item.RequestBy!.FullName)
+                </td>
+            <td>
+                $@Html.DisplayFor(modelItem => item.Total)
+            </td>
+            <td>
+              
+                        @if (@item.RequestStatus?.Status == "Rejected")
+                        {
+                            <a class="btn btn-danger" > @Html.DisplayFor(modelItem => item.RequestStatus.Status)</a>
+                        }
+                        else if (@item.RequestStatus?.Status == "Approved")
+                        {
+                            <a class="btn btn-success" >@item.RequestStatus?.Status</a>
+                        }
+                        else if (@item.RequestStatus?.Status == "Wait For Approvement")
+                        {
+                        <a class="btn btn-warning">@item.RequestStatus?.Status</a>
+                        }
+                        else
+                        {
+                        <a class="btn btn-info">@item.RequestStatus?.Status</a>
+                        }
+            </td>
+            <td>
+                @if(item.Id <999990)
+                    {
+                        <a asp-action="RequestDetail" asp-controller="Request" asp-route-id="@item.Id">
+                            <button class="btn btn-danger lightgreen-icon-notika btn-reco-mg btn-button-mg"><i class="notika-icon notika-menus"></i>SEE DETAIL</button>
+                        </a>
+
+                    }
+                    else
+                    {
+                        <a asp-action="NewRequestDetail" asp-controller="Request" asp-route-id="@item.Id">
+                            <button class="btn btn-danger lightgreen-icon-notika btn-reco-mg btn-button-mg"><i class="notika-icon notika-menus"></i>SEE DETAIL</button>
+                        </a>
+
+                    }
+
+        
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // Function to load data using AJAX
+        function loadData(requestType) {
+            $.ajax({
+                url: '@Url.Action("GetReceivedRequestsByType", "Request")',
+                type: 'GET',
+                data: { type: requestType },
+                success: function (data) {
+
+                    $('#ReceivedRequest tbody').html(data);
+                },
+                error: function () {
+                    alert('Error loading data.');
+                }
+            });
+        }
+
+        // Click event for Approved button
+        $('#NeedApprovalBtn').click(function () {
+            loadData('NeedApproval');
+        });
+
+        // Click event for InProgress button
+        $('#otherBtn').click(function () {
+            loadData('Other');
+        });
+    });
+</script>
+
+

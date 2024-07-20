@@ -1,0 +1,64 @@
+﻿@model IEnumerable<Group5.Models.Brand>
+
+@{
+    ViewData["Title"] = "Brand";
+}
+@if (TempData.ContainsKey("success"))
+{
+    <div class="alert alert-success" style="font-size:25px">
+        @TempData["success"]
+    </div>
+}
+
+@if (TempData.ContainsKey("error"))
+{
+    <div class="alert alert-danger">
+        @TempData["error"]
+    </div>
+}
+@if (TempData.ContainsKey("message"))
+{
+    <div class="alert alert-danger">
+        @TempData["message"]
+    </div>
+}
+
+
+<p>
+    <a asp-action="CreateBrand" class="btn btn-danger confirm" style="width:220px;height:45px;font-size:20px">Create New Brand</a>
+</p>
+<h1 style="text-align:center">Brand</h1>
+<table class="table table-cl" id="Brand">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+           
+            @* <th>
+                @Html.DisplayNameFor(model => model.ImageUrl)
+            </th> *@
+            
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+           
+            @* <td>
+                @Html.DisplayFor(modelItem => item.ImageUrl)
+            </td> *@
+            
+            <td>
+                    <a asp-action="EditBrand" asp-route-id="@item.Id" class="btn btn-success">Edit</a> |
+                    <a asp-action="DetailsBrand" asp-route-id="@item.Id" class="btn btn-info">Stationery</a> |
+                    <a asp-action="DeleteBrand" asp-route-id="@item.Id" class="btn btn-danger">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

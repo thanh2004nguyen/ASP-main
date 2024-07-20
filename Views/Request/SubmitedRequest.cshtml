@@ -1,0 +1,219 @@
+﻿@model IEnumerable<Group5.Models.Base.RequestBase>
+
+@{
+    ViewData["Title"] = "List Submited Request";
+
+}
+
+<h1 style="text-align:center">List Submited Request</h1>
+
+
+<table class="table table-cl" id="SubmitedRequest">
+    <thead>
+        <tr>
+            <th class="active">
+                @Html.DisplayNameFor(model => model.Id)
+            </th>
+            <th class="active">
+                @Html.DisplayNameFor(model => model.CreatedAt)
+            </th>
+            <th class="active">
+                @Html.DisplayNameFor(model => model.Total)
+            </th>
+            <th class="active">
+                Status
+            </th class="active">
+            <th class="active"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Id)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CreatedAt)
+                </td>
+                <td>
+                    $@Html.DisplayFor(modelItem => item.Total)
+                </td>
+                <td>
+                    <div id="statusElement" class="notification-demo statusElement">
+                        @if (@item.RequestStatus?.Status == "Rejected")
+                        {
+                            <a class="btn btn-danger waves-effect" data-type="danger">@item.RequestStatus?.Status</a>
+                        }
+                        else if (@item.RequestStatus?.Status == "Approved")
+                        {
+                            <a class="btn btn-success waves-effect" data-type="success">@item.RequestStatus?.Status</a>
+                        }
+                        else if (@item.RequestStatus?.Status == "Wait For Approvement")
+                        {
+                            <a class="btn btn-warning waves-effect" data-type="warning">@item.RequestStatus?.Status</a>
+                        }
+                        else
+                        {
+                            <a class="btn btn-info waves-effect" data-type="info">@item.RequestStatus?.Status</a>
+                        }
+                    </div>
+                </td>
+                <td>
+                    @if(item.Id<999990)
+                    {
+                       <a asp-action="OwnRequestDetail" asp-controller="Request" asp-route-id="@item.Id">
+                        <button class="btn btn-danger lightgreen-icon-notika btn-reco-mg btn-button-mg"><i class="notika-icon notika-menus"></i>SEE DETAIL</button>
+                        </a>
+                             @if(@item.RequestStatus?.Status == "Wait For Approvement")
+                             {
+                                    <a  data-id="@item.Id" class="btn btn-danger lightgreen-icon-notika btn-reco-mg btn-button-mg withdraw">WITHDRAW</a>
+                             }
+                             else if(@item.RequestStatus?.Status == "Approved" || @item.RequestStatus?.Status == "Sending" || @item.RequestStatus?.Status == "In Progress" || @item.RequestStatus?.Status == "Completed" )
+                            {
+                               <a data-id="@item.Id" class="btn btn-danger lightgreen-icon-notika btn-reco-mg btn-button-mg cancel">CANCEL</a>
+                            }
+                    }
+                    else
+                    {
+                        <a asp-action="OwnNewRequestDetail" asp-controller="Request" asp-route-id="@item.Id">
+                        <button class="btn btn-danger lightgreen-icon-notika btn-reco-mg btn-button-mg"><i class="notika-icon notika-menus"></i>SEE DETAIL</button>
+                        </a>
+                               @if(@item.RequestStatus?.Status == "Wait For Approvement")
+                             {
+                                    <a  data-id="@item.Id" class="btn btn-danger lightgreen-icon-notika btn-reco-mg btn-button-mg withdraw">WITHDRAW</a>
+                             }
+                             else if(@item.RequestStatus?.Status == "Approved")
+                            {
+                               <a data-id="@item.Id" class="btn btn-danger lightgreen-icon-notika btn-reco-mg btn-button-mg cancel">CANCEL</a>
+                            }
+                    }
+
+
+                   
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+ <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+        $(document).ready(function () {
+            $(".withdraw").click(function () {
+         
+                $.ajax({
+                    url: "/Request/withdraw",
+                    data: {
+                        id: $(this).data("id"),
+                        type: "ajax"
+                    },
+                    success: function (data) {
+                        if (data.error) {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Can't Process This Request Now!!!!",
+                                text: "Please Try Later",
+                                footer: '<a href="#">Why do I have this issue?</a>',
+                                timer: 1500
+                            });
+                        } else {
+                            Swal.fire({
+                                position: "top-end",
+                                icon: "success",
+                                title: "You WithDraw Request Successfully!",
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+
+                            setTimeout(function () {
+                                location.reload();
+                            }, 1500);
+                        }
+
+
+                    },
+                    error: function (data) {
+                        if (data && data.responseJSON && data.responseJSON.error) {
+                            // Handle the error response
+                            Swal.fire({
+                                icon: "error",
+                                title: "Error",
+                                text: data.responseJSON.errorMessage,
+                                timer: 1500
+                            });
+                        } else {
+                            // Generic error handling
+                            Swal.fire({
+                                icon: "error",
+                                title: "Can't Process This Request Now!!!!",
+                                text: "Please Try Later",
+                                footer: '<a href="#">Why do I have this issue?</a>',
+                                timer: 1500
+                            });
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+
+    <script>
+                $(document).ready(function () {
+            $(".cancel").click(function () {
+         
+                $.ajax({
+                    url: "/Request/cancel",
+                    data: {
+                        id: $(this).data("id"),
+                        type: "ajax"
+                    },
+                    success: function (data) {
+                        if (data.error) {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Can't Process This Request Now",
+                                text: "Please Try Later",
+                                footer: '<a href="#">Why do I have this issue?</a>',
+                                timer: 1500
+                            });
+                        } else {
+                            Swal.fire({
+                                position: "top-end",
+                                icon: "success",
+                                title: "You Submited For Cancel This Request Successfully!Please Wait For Approval!",
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+
+                            setTimeout(function () {
+                                location.reload();
+                            }, 1500);
+                        }
+
+
+                    },
+                    error: function (data) {
+                        if (data && data.responseJSON && data.responseJSON.error) {
+                            // Handle the error response
+                            Swal.fire({
+                                icon: "error",
+                                title: "Error",
+                                text: data.responseJSON.errorMessage,
+                                timer: 1500
+                            });
+                        } else {
+                            // Generic error handling
+                            Swal.fire({
+                                icon: "error",
+                                title: "Can't Process This Request Now",
+                                text: "Please Try Later",
+                                footer: '<a href="#">Why do I have this issue?</a>',
+                                timer: 1500
+                            });
+                        }
+                    }
+                });
+            });
+        });
+    </script>

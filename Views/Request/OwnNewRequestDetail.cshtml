@@ -1,0 +1,471 @@
+﻿@model Group5.Models.NewStationeryRequest
+@using Group5.Data
+@{
+    ViewData["Title"] = "Approved Request Detail";
+}
+<head>
+    <style>
+
+        /* Style The Dropdown Button */
+        .dropbtn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 16px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* The container <div> - needed to position the dropdown content */
+        .dropdown {
+            position: relative;
+            display: flex;
+        }
+
+        /* Dropdown Content (Hidden by Default) */
+        .dropdown-content {
+            display: none;
+            position: relative;
+            background-color: #f9f9f9;
+            min-width: 100px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+        }
+
+
+            /* Links inside the dropdown */
+            .dropdown-content a {
+                color: black;
+                padding: 12px 16px;
+                text-decoration: none;
+                display: block;
+            }
+
+                /* Change color of dropdown links on hover */
+                .dropdown-content a:hover {
+                    background-color: cadetblue
+                }
+
+        /* Show the dropdown menu on hover */
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        /* Change the background color of the dropdown button when the dropdown content is shown */
+        .dropdown:hover .dropbtn {
+            background-color: #3e8e41;
+        }
+
+        .reject {
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: cadetblue;
+            color: black;
+            text-decoration: none;
+            border: 1px solid yellow;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+            .reject:hover {
+                background-color: red;
+                color: white;
+                border-color: red;
+            }
+
+
+        .approve {
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: #166D9A;
+            color: black;
+            text-decoration: none;
+            border: 1px solid yellow;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+            .approve:hover {
+                background-color: Green;
+                color: white;
+                border-color: green;
+            }
+
+
+        .list-group-item.active {
+            background: #ffc107;
+        }
+        /* end common class */
+        .top-status ul {
+            list-style: none;
+            display: flex;
+            justify-content: space-around;
+            justify-content: center;
+            flex-wrap: wrap;
+            padding: 0;
+            margin: 0;
+        }
+
+            .top-status ul li {
+                width: 120px;
+                height: 120px;
+                border-radius: 50%;
+                background: #fff;
+                display: flex;
+                justify-content: center;
+                flex-direction: column;
+                align-items: center;
+                border: 8px solid #ddd;
+                box-shadow: 1px 1px 10px 1px #ddd inset;
+                margin: 10px 5px;
+            }
+
+                .top-status ul li.active {
+                    border-color: #ffc107;
+                    box-shadow: 1px 1px 20px 1px #ffc107 inset;
+                }
+        /* end top status */
+
+        ul.timeline {
+            list-style-type: none;
+            position: relative;
+        }
+
+            ul.timeline:before {
+                content: ' ';
+                background: #d4d9df;
+                display: inline-block;
+                position: absolute;
+                left: 29px;
+                width: 2px;
+                height: 100%;
+                z-index: 400;
+            }
+
+            ul.timeline > li {
+                margin: 20px 0;
+                padding-left: 30px;
+            }
+
+                ul.timeline > li:before {
+                    content: '\2713';
+                    background: #fff;
+                    display: inline-block;
+                    position: absolute;
+                    border-radius: 50%;
+                    border: 0;
+                    left: 5px;
+                    width: 50px;
+                    height: 50px;
+                    z-index: 400;
+                    text-align: center;
+                    line-height: 50px;
+                    color: #d4d9df;
+                    font-size: 24px;
+                    border: 2px solid #d4d9df;
+                }
+
+                ul.timeline > li.active:before {
+                    content: '\2713';
+                    background: #28a745;
+                    display: inline-block;
+                    position: absolute;
+                    border-radius: 50%;
+                    border: 0;
+                    left: 5px;
+                    width: 50px;
+                    height: 50px;
+                    z-index: 400;
+                    text-align: center;
+                    line-height: 50px;
+                    color: #fff;
+                    font-size: 30px;
+                    border: 2px solid #28a745;
+                }
+                .product-des{
+                    font-size:18px;
+                    font-weight:bold;
+                    color : darkslateblue
+                }
+
+    </style>
+
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <link rel="stylesheet" href="~/css/Tracking.css">
+  @*   <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script> *@
+    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+</head>
+
+<body>
+    <section class="my-5">
+        <div class="container">
+            <div class="main-body">
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="card">
+                            <div style="font-size:35px;text-align:center;color:cadetblue">SUBMITED BY</div>
+                            <div class="card-body">
+                                <div class="d-flex flex-column align-items-center text-center">
+                                    <img src="~/images/@Model.RequestBy?.Avatar" alt="image"
+                                         class="rounded-circle p-1 bg-warning" width="110">
+                                    <div class="mt-3">
+                                        <h4 class="product-des">@Model.RequestBy?.FullName</h4>
+                                        <p class="text-secondary mb-1 product-des">@Model.RequestBy?.Departments?.Name</p>
+                                        <p class="text-muted font-size-sm product-des">@Model.RequestBy?.EmployeePositions?.Position</p>
+                                    </div>
+                                </div>
+                                <div class="list-group list-group-flush text-center mt-4">
+                                    <a href="#" class="list-group-item list-group-item-action border-0 active">
+                                        Profile Informaton
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-8">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="top-status">
+                                    <h5 style="font-size:35px;text-align:center;color:cadetblue">REQUEST# @Model.Id TRACKING LINE</h5>
+                                    <div class="row shop-tracking-status" style="height:350px">
+                                        <div class="order-status">
+
+                                            @if (Model.RequestStatus?.Status == "Wait For Approvement")
+                                            {
+
+                                                <div class="order-status-timeline">
+                                                    <!-- class names: c0 c1 c2 c3 and c4 -->
+                                                    <div class="order-status-timeline-completion c0"></div>
+                                                </div>
+                                                <div class="image-order-status image-order-status-new active img-circle">
+                                                    <span class="status">Wait For Approvement</span>
+                                                    <div class="icon"></div>
+                                                </div>
+                                                <div class="image-order-status image-order-status-active active img-circle">
+                                                    <span class="status">Approved</span>
+                                                    <div class="icon"></div>
+                                                </div>
+                                                <div class="image-order-status image-order-status-intransit active img-circle">
+                                                    <span class="status">Wait For Supplier</span>
+                                                    <div class="icon"></div>
+                                                </div>
+                                                <div class="image-order-status image-order-status-delivered active img-circle">
+                                                    <span class="status">SENDING</span>
+                                                    <div class="icon"></div>
+                                                </div>
+                                                <div class="image-order-status image-order-status-completed active img-circle">
+                                                    <span class="status">Completed</span>
+                                                    <div class="icon"></div>
+                                                </div>
+
+                                            }
+                                            else if (Model.RequestStatus?.Status == "Approved")
+                                            {
+                                                <div class="order-status-timeline">
+                                                    <!-- class names: c0 c1 c2 c3 and c4 -->
+                                                    <div class="order-status-timeline-completion c1"></div>
+                                                </div>
+                                                <div class="image-order-status image-order-status-new active img-circle">
+                                                    <span class="status">Wait For Approvement</span>
+                                                    <div class="icon"></div>
+                                                </div>
+                                                <div class="image-order-status image-order-status-active active img-circle">
+                                                    <span class="status">Approved</span>
+                                                    <div class="icon"></div>
+                                                </div>
+                                                <div class="image-order-status image-order-status-intransit active img-circle">
+                                                    <span class="status">Wait For Supplier</span>
+                                                    <div class="icon"></div>
+                                                </div>
+                                                <div class="image-order-status image-order-status-delivered active img-circle">
+                                                    <span class="status">SENDING</span>
+                                                    <div class="icon"></div>
+                                                </div>
+                                                <div class="image-order-status image-order-status-completed active img-circle">
+                                                    <span class="status">Completed</span>
+                                                    <div class="icon"></div>
+                                                </div>
+
+                                            }
+
+                                            else if (Model.RequestStatus?.Status == "In Progress")
+                                            {
+                                                <div class="order-status-timeline">
+                                                    <!-- class names: c0 c1 c2 c3 and c4 -->
+                                                    <div class="order-status-timeline-completion c2"></div>
+                                                </div>
+                                                <div class="image-order-status image-order-status-new active img-circle">
+                                                    <span class="status">Wait For Approvement</span>
+                                                    <div class="icon"></div>
+                                                </div>
+                                                <div class="image-order-status image-order-status-active active img-circle">
+                                                    <span class="status">Approved</span>
+                                                    <div class="icon"></div>
+                                                </div>
+                                                <div class="image-order-status image-order-status-intransit active img-circle">
+                                                    <span class="status">Wait For Supplier</span>
+                                                    <div class="icon"></div>
+                                                </div>
+                                                <div class="image-order-status image-order-status-delivered active img-circle">
+                                                    <span class="status">SENDING</span>
+                                                    <div class="icon"></div>
+                                                </div>
+                                                <div class="image-order-status image-order-status-completed active img-circle">
+                                                    <span class="status">Completed</span>
+                                                    <div class="icon"></div>
+                                                </div>
+                                            }
+
+                                            else if (Model.RequestStatus?.Status == "Sending")
+                                            {
+                                                <div class="order-status-timeline">
+                                                    <!-- class names: c0 c1 c2 c3 and c4 -->
+                                                    <div class="order-status-timeline-completion c3"></div>
+                                                </div>
+                                                <div class="image-order-status image-order-status-new active img-circle">
+                                                    <span class="status">Wait For Approvement</span>
+                                                    <div class="icon"></div>
+                                                </div>
+                                                <div class="image-order-status image-order-status-active active img-circle">
+                                                    <span class="status">Approved</span>
+                                                    <div class="icon"></div>
+                                                </div>
+                                                <div class="image-order-status image-order-status-intransit active img-circle">
+                                                    <span class="status">Wait For Supplier</span>
+                                                    <div class="icon"></div>
+                                                </div>
+                                                <div class="image-order-status image-order-status-delivered active img-circle">
+                                                    <span class="status">SENDING</span>
+                                                    <div class="icon"></div>
+                                                </div>
+                                                <div class="image-order-status image-order-status-completed active img-circle">
+                                                    <span class="status">Completed</span>
+                                                    <div class="icon"></div>
+                                                </div>
+                                            }
+
+
+                                            else if (Model.RequestStatus?.Status == "Completed")
+                                            {
+                                                <div class="order-status-timeline">
+                                                    <!-- class names: c0 c1 c2 c3 and c4 -->
+                                                    <div class="order-status-timeline-completion c4"></div>
+                                                </div>
+                                                <div class="image-order-status image-order-status-new active img-circle">
+                                                    <span class="status">Wait For Approvement</span>
+                                                    <div class="icon"></div>
+                                                </div>
+                                                <div class="image-order-status image-order-status-active active img-circle">
+                                                    <span class="status">Approved</span>
+                                                    <div class="icon"></div>
+                                                </div>
+                                                <div class="image-order-status image-order-status-intransit active img-circle">
+                                                    <span class="status">Wait For Supplier</span>
+                                                    <div class="icon"></div>
+                                                </div>
+                                                <div class="image-order-status image-order-status-delivered active img-circle">
+                                                    <span class="status">SENDING</span>
+                                                    <div class="icon"></div>
+                                                </div>
+                                                <div class="image-order-status image-order-status-completed active img-circle">
+                                                    <span class="status">Completed</span>
+                                                    <div class="icon"></div>
+                                                </div>
+                                            }
+
+                                            else if (Model.RequestStatus?.Status == "Rejected")
+                                            {
+                                                <div class="order-status-timeline">
+                                                    <!-- class names: c0 c1 c2 c3 and c4 -->
+                                                    <div class="order-status-timeline-completion c4"></div>
+                                                </div>
+                                                <div class="image-order-status image-order-status-new active img-circle">
+                                                    <span class="status">Wait For Approvement</span>
+                                                    <div class="icon"></div>
+                                                </div>
+
+                                                <div class="image-order-status image-order-status-rejected active img-circle">
+                                                    <span class="status">Rejected</span>
+                                                    <div class="icon"></div>
+                                                </div>
+                                            }
+
+
+                                            else if (Model.RequestStatus?.Status == "Canceled/WithDraw")
+                                            {
+                                                <div class="order-status-timeline">
+                                                    <!-- class names: c0 c1 c2 c3 and c4 -->
+                                                    <div class="order-status-timeline-completion c4"></div>
+                                                </div>
+                                                <div class="image-order-status image-order-status-new active img-circle">
+                                                    <span class="status">Wait For Approvement</span>
+                                                    <div class="icon"></div>
+                                                </div>
+                                                <div class="image-order-status image-order-status-canceled active img-circle">
+                                                    <span class="status">Canceled</span>
+                                                    <div class="icon"></div>
+                                                </div>
+                                            }
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-4">
+                    <div class="card-body p-0 table-responsive">
+                        <h4 class="p-3 mb-0" style="font-size:35px;text-align:center;color:cadetblue">Product Description</h4>
+                        <div class="d-flex flex-row align-items-center" >
+                            <img src="~/images/@Model.Image" alt="image" class="rounded-circle p-1 bg-warning" width="220" style="height:220px;margin-right: 50px;">
+                            <div class="ml-4">
+                                <h3 style="color:indianred">Item Name: @Model.ItemName</h3>
+                                <p class="product-des">Request Time: @Model.CreatedAt</p>
+                                <p class="product-des">Quantity: @Model.Quantity</p>
+                                <p class="product-des">Price: $@Model.Price</p>
+                                <p class="product-des">Total: $@Model.Total</p>
+                                <p class="product-des">Description: @Model.Description</p>
+                                <span style="font-size:18px;font-weight:bold;color:darkslateblue">Request Status:</span>
+                                <span class="badge badge-success product-des" style="font-size:18px;font-weight:bold;color:darkslateblue">@Model.RequestStatus?.Status</span>
+                                @if (@Model.RequestStatus?.Status == "Rejected")
+                                {
+                                    <span style="font-size:18px;font-weight:bold;color:darkslateblue">Reason:</span>
+                                    <span class="badge badge-success product-des" style="font-size:16px;font-weight:bold;color:darkslateblue">@Model?.RejectReason</span>
+                                }
+
+                            </div>
+
+                        </div>
+                 
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous"></script>
+</body>
+
+

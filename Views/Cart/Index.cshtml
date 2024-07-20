@@ -1,0 +1,219 @@
+﻿@using Group5.Data
+@model IEnumerable<Group5.Models.CartItem>
+
+@{
+    ViewData["Title"] = "Index";
+    var user = ViewData["user"] as Employee;
+}
+
+
+<link rel="stylesheet" href="~/css/cart.css">
+@if (TempData.ContainsKey("success"))
+{
+    <div class="alert alert-success">
+        @TempData["success"]
+    </div>
+}
+
+@if (TempData.ContainsKey("error"))
+{
+    <div class="alert alert-danger">
+        @TempData["error"]
+    </div>
+}
+<h1 style="text-align:center">List Request Item</h1>
+<link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css">
+<div class="container bootstrap snippets bootdey">
+    <div class="col-md-9 col-sm-8 content" style="width:100%">
+     
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-info panel-shadow">
+                    <div class="panel-heading">
+                        <h3 style="text-align:center">
+                            <img class="img-circle img-thumbnail" src="~/images/@user!.Avatar" style="max-width:100px;max-height:100px">
+                            Hello:@user.FullName <br />
+                        </h3>
+                        <div style="text-align:center;font-size:20px;color:red">
+                            Your Current Request Amount is
+                            $@user.AmountRequestPerMonth . <br />
+                            This Request Amount Will Reset EachMonth!. <br />
+                            You Can Not Make Request If Total More Than Your Current Request Amount
+                        </div>
+                    </div>
+
+                    <div class="panel-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Description</th>
+                                        <th>Qty</th>
+                                        <th>Price</th>
+                                        <th>Total($)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        var subtotal = item!.StationeryItem!.Price*item.Quantity;                               
+                                        <tr id="cartItem_@item.Id">
+                                            <td><img src="~/images/@item.StationeryItem.ImageUrl" alt="@item.StationeryItem" class="img-cart"></td>
+                                            <td><strong>@item.StationeryItem.Name</strong><p>Size : 26</p></td>
+                                            <td>
+                                                <form class="form-inline">
+                                                    <input class="form-control quantity-input" type="number" value="@item.Quantity" data-id="@item.Id" min="1" max="100" id="quantity_@item.Id">
+                                                    <div id="quantity-errors"></div>
+                                                    <button class="btn btn-primary delete-cart-item1" data-id="@item.Id"><i class="fa fa-trash-o"></i></button> 
+                                                </form>
+                                            </td>
+                                            <td>$@item.StationeryItem.Price</td>
+                                            <td id="subTotal_@item.Id">$@subtotal</td>
+                                        </tr>
+                                    }
+                                    <tr>
+                                        <td colspan="6">&nbsp;</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4" class="text-right"><strong>Total:$</strong></td>
+                                        <td id="total">$@ViewData["total"]</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <a asp-action="Index" asp-controller="Home" class="btn btn-success"><span class="glyphicon glyphicon-arrow-left"></span>&nbsp;Select More Item</a>
+                <a data-action="Index" data-controller="Request" class="btn btn-primary pull-right make-request-btn">
+                    Make a Request<span class="glyphicon glyphicon-chevron-right"></span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+ @section script
+ {
+   @* Delete Cart Item Ajax *@
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+
+        $(document).ready(function () {
+            $(".delete-cart-item1").on("click", function (e) {
+                e.preventDefault();
+                var itemId = $(this).data("id");
+                var row = $("#cartItem_" + itemId);
+
+                $.ajax({
+                    url: "/Cart/DeleteCartItem",
+                    type: "GET",
+                    data: { id: itemId },
+                    success: function (data) {
+                        if (data.success) {
+                            row.fadeOut(1, function () {
+                                 row.remove();
+                                 updateTotal(data.total);
+                                 $("#cartcount").html(data.items);
+                                $(".delete-cart-item1[data-id='" + itemId + "']").click();
+                            });
+                      
+                        } else {
+                            console.error("Error deleting cart item:", data.error);
+                        }
+                    },
+                    error: function (error) {
+                        // Handle errors
+                        console.error("Error deleting cart item:", error);
+                    }
+                });
+            });
+
+            function updateTotal(total) {
+                // Update the UI with the new total
+                $("#total").text(total);
+                $("#totalheader").text(total);
+            }
+        });
+    </script>
+
+    @* update quantity ajax *@
+    <script>
+        $(document).ready(function () {
+            $(".quantity-input").on("input", function () {
+                var itemId = $(this).data("id");
+                var quantity = $(this).val();
+                // Perform the Ajax request
+                $.ajax({
+                    url: "/Cart/UpdateCartQuantity",
+                    type: "GET", 
+                    data: { id: itemId, quantity: quantity },
+                    success: function (data) {
+                        // Update the UI or handle success as needed
+                        console.log(data);
+                        $(".quantity-input[data-id='" + itemId + "']").val(data.quantity);
+                        $("#subTotal_" + itemId).text(data.subtotal);
+                        updateTotal(data.total);
+                    },
+                    error: function (error) {
+                      
+                        console.error("Error updating quantity:", error);
+                    }
+                });
+            });
+            function updateTotal(total) {
+                // Update the UI with the new total
+                $("#total").text(total);
+                $("#totalheader").text(total);
+            }
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $(".pull-right").on("click", function (e) {
+                // Prevent the link from navigating
+                e.preventDefault();
+
+                // Remove existing error messages
+                $(".quantity-error").remove();
+
+                // Check quantity for each item
+                var isValid = true;
+
+                $(".quantity-input").each(function () {
+                    var quantity = $(this).val();
+                    var errorSpan = $("<span class='text-danger quantity-error'>Quantity must be between 1 and 100.</span>");
+
+                    if (quantity <= 0 || quantity > 100) {
+                        isValid = false;
+                        // Display an error message next to the quantity input
+                        $(this).after(errorSpan);
+                    }
+                });
+
+                // If all quantities are valid, navigate to the specified action and controller
+                if (isValid) {
+                    var action = $(this).data("action");
+                    var controller = $(this).data("controller");
+                    var url = "/" + controller + "/" + action;
+                    window.location.href = url;
+                }
+            });
+
+            // Enable the button when the quantity is within the valid range
+            $(".quantity-input").on("input", function () {
+                var quantity = $(this).val();
+                var makeRequestBtn = $(".make-request-btn");
+
+                // Enable the button if the quantity is within the valid range
+                if (quantity > 0 && quantity <= 100) {
+                    makeRequestBtn.prop("disabled", false);
+                } else {
+                    makeRequestBtn.prop("disabled", true);
+                }
+            });
+        });
+    </script>
+
+}

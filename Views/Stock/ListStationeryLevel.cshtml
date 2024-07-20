@@ -1,0 +1,218 @@
+﻿@model IEnumerable<Group5.ViewModels.StationeryItemViewModel>
+@using Group5.ViewModels
+@{
+    ViewData["Title"] = "ListStationeryLevel";
+    var useless = ViewData["uselessList"] as List<StationeryItem>;
+   
+}
+<style>
+    img{
+        width: 60px;
+        height:60px;
+        object-fit:cover;
+    }
+    th, td {
+        text-align: center;
+    }
+    .divHover {
+        height: 100%;
+    }
+    .check-link {
+        position:absolute;
+        color: blue;
+        font-size: 20px;
+        height: 70%;
+        z-index:1;
+    }
+
+    .hover-content {
+        display:none;
+        position:absolute;
+        background-color: transparent;
+        border: 1px solid #ddd;
+        padding: 5px;
+        border:none;
+        color:gray;
+        height: 70%;
+        z-index:0;
+    }
+</style>
+<h1 style="color: #7c795d; font-family: 'Trocchi', serif; font-size: 45px; font-weight: normal; line-height: 48px; margin: 0">
+    Warning low stockLevel list 
+</h1>
+<br />
+<table class="table" id="ListStockLevelWarning">
+    <thead style="background: #99b19c;">
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Price)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ImageUrl)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Quantity)
+            </th>
+
+            <th>
+                @Html.DisplayNameFor(model => model.StatusRestock)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model!.StockLevel!.Level)
+            </th>
+            <th>Restock</th>
+        </tr>
+    </thead>
+    <tbody style="background: white;">
+@foreach (var item in Model) {
+         
+            <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Price)
+            </td>
+            <td>
+                    <img src="~/images/@item.ImageUrl" alt="product" class="" width="60" height="60">
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Quantity)
+            </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.StatusRestock)
+                </td>
+
+                <td>
+                    @if (item?.StockLevel?.Level == 1)
+                    {
+                        <p style="color:red">@Html.DisplayFor(modelItem => item!.StockLevel!.Level)</p>
+                    }
+                    else if (item?.StockLevel?.Level == 2)
+                    {
+                        <p style="color:#ffcc00">@Html.DisplayFor(modelItem => item!.StockLevel!.Level)</p>
+                    }
+                    else
+                    {
+                        <p style="color:green">@Html.DisplayFor(modelItem => item!.StockLevel!.Level)</p>
+                    }
+                </td>
+                <td>
+
+                    <a style="color: #fd5c63;font-size:20px" asp-action="OderMoreGood" asp-route-id="@item.Id">+</a>
+                </td>
+        </tr>
+}
+    </tbody>
+</table>
+<h1 style="color: #7c795d; font-family: 'Trocchi', serif; font-size: 45px; font-weight: normal; line-height: 48px; margin: 0">
+    Use-Less-Items List
+</h1>
+
+<br />
+<table class="table" id="ListUselessWarning">
+    <thead style="background: #99b19c;" >
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+         
+  
+            <th>
+                @Html.DisplayNameFor(model => model.ImageUrl)
+            </th>
+            <th>
+                Check For This Year
+            </th>
+            <th>
+                Time Not Using
+            </th>
+            <th>
+                Risk Level
+            </th>
+            <th>
+                Check Status
+            </th>
+        </tr>
+    </thead>
+    <tbody style="background: white">
+        @foreach (var item in useless.OrderBy(x => x.isCheckUseLess))
+        {
+            int? time = (int)(item?.UseLessItem?.MaxTime / 365);
+            <tr>
+                <td>
+                    @item?.Name
+                </td>
+
+                <td>
+                    <img src="~/images/@item?.ImageUrl" alt="product" class="" width="60" height="60">
+                </td>
+
+                @if (item?.isCheckUseLess == true)
+                {
+                    <td style="color:green">   Checked  </td>
+                }
+                else
+                {
+                    <td style="color:red">   Not Check Yet  </td>
+                }
+
+                <td>
+                    >@time (Years)
+                </td>
+
+                <td>
+                    @if (item?.UseLessItem?.StockLevel == 1)
+                    {
+                        <span style="color:red">@item?.UseLessItem?.StockLevel</span>
+                    }
+                    else
+                    {
+                        <span style="color:	#008000">@item?.UseLessItem?.StockLevel</span>
+                    }
+                </td>
+
+                <td class="divHover">
+                    <div class="hover-content">
+                        <p style="padding: 20px 0 0 10px; ">
+                            Click to checked
+                        </p>
+                    </div>
+                    @if (item?.isCheckUseLess != true)
+                    {
+                        <a class="check-link" asp-action="CheckUseLess" asp-route-id="@item.Id">✔</a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<!-- Add this script at the end of your HTML file, just before the closing </body> tag -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var checkLinks = document.querySelectorAll('.check-link');
+
+        checkLinks.forEach(function (link) {
+            link.addEventListener('mouseover', function () {
+                var parentTd = link.closest('td');
+                var hoverContent = parentTd.querySelector('.hover-content');
+
+                if (hoverContent) {
+                    hoverContent.style.display = 'block';
+                }
+            });
+
+            link.addEventListener('mouseout', function () {
+                var parentTd = link.closest('td');
+                var hoverContent = parentTd.querySelector('.hover-content');
+
+                if (hoverContent) {
+                    hoverContent.style.display = 'none';
+                }
+            });
+        });
+    });
+</script>

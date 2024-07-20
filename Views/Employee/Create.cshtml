@@ -1,0 +1,327 @@
+﻿@model Group5.ViewModels.CreateEmployee
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+
+
+
+<style>
+
+    h1 {
+        color: green;
+    }
+
+    hr {
+        border-color: white;
+    }
+
+    .row {
+        margin: 20px;
+    }
+
+    form {
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        color: black;
+    }
+
+    input,
+    select,
+    button {
+        width: 100%;
+        padding: 10px;
+        margin-top: 5px;
+        margin-bottom: 15px;
+        box-sizing: border-box;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    button {
+        background-color: green;
+        color: white;
+        cursor: pointer;
+    }
+
+    .form-check {
+        display: flex;
+        align-items: center;
+    }
+
+    .form-check-input {
+        margin-right: 5px;
+    }
+
+    a {
+        color: white;
+    }
+
+    .role-container {
+        margin-bottom: 20px;
+    }
+
+    .role-checkbox {
+        display: flex;
+        width: 50%;
+        float: left;
+        margin-bottom: 10px;
+    }
+
+        .role-checkbox input {
+            margin-right: 5px;
+            width: 50%;
+            float: left;
+        }
+
+    .role-label {
+        color: black;
+    }
+</style>
+
+
+
+
+@if (TempData.ContainsKey("message"))
+{
+    <div class="alert alert-success">
+        @TempData["message"]
+    </div>
+}
+@if (TempData.ContainsKey("success"))
+{
+    <div class="alert alert-success">
+        @TempData["success"]
+    </div>
+}
+
+@if (TempData.ContainsKey("error"))
+{
+    <div class="alert alert-danger">
+        @TempData["error"]
+    </div>
+}
+<h1 style="text-align:center">Create New Employee</h1>
+
+<div class="row" style="display:flex;justify-content:space-between;align-items:center">
+    <div class="col-md-4">
+        <form asp-action="Create" asp-controller="Employee" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <label asp-for="FullName" class="control-label"></label>
+                <input asp-for="FullName" id="name" class="form-control" />
+                <span asp-validation-for="FullName" class="text-danger"></span>
+                <div id="name-error"></div>
+            </div>
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Email" class="control-label"></label>
+                <input id="email" asp-for="Email" class="form-control" required />
+                <span asp-validation-for="Email" class="text-danger"></span>
+                <div id="email-error"></div>
+            </div>
+            <div class="form-group">
+                <label asp-for="Password" name="Password" class="control-label"></label>
+                <input asp-for="Password" class="form-control" id="password" type="password" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+                <div id="password-error"></div>
+            </div>
+            <div class="form-group">
+                <label style="color:black" name="ConfirmPassword" class="control-label">Confirm Password</label>
+                <input name="ConfirmPassword" class="form-control" id="password_confirmation" type="password" />
+                <span name="ConfirmPassword" class="text-danger"></span>
+                <div id="confirm-password-error"></div>
+            </div>
+            <div class="form-group">
+                <label name="Photo" class="control-label">Photo</label>
+                <input asp-for="Photo" class="form-control" type="file" />
+                <span asp-validation-for="Photo" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label  class="control-label"> Department Name</label>
+                <select asp-for="DepartmentId" asp-items="@ViewBag.DepartName" class="form-control"></select>
+                <span asp-validation-for="DepartmentId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="EmployeePositionId" class="control-label">EmployeePosition Name</label>
+                <select asp-for="EmployeePositionId" class="form-control" id="PositionId">
+                    <option value="">Select Position</option> <!-- Added option -->
+                    @foreach (var position in ViewBag.PositionName)
+                    {
+                        <option value="@position.Value">@position.Text</option>
+                    }
+                </select>
+                <span asp-validation-for="EmployeePositionId" class="text-danger"></span>
+            </div>
+            <div class="form-group" id="supervisorField">
+                <label asp-for="SupperVisorId" class="control-label">SupperVisor Name</label>
+                <select asp-for="SupperVisorId" class="form-control" id="SupperVisorId"></select>
+                <span asp-validation-for="SupperVisorId" class="text-danger"></span>
+            </div>
+            <div class="form-group role-container">
+                <label>Role</label>
+                @foreach (var role in ViewBag.RoleName.Items)
+                {
+                    <div class="role-checkbox">
+                        <input type="checkbox" class="form-check-input" name="ListRoles" value="@role.Id">
+                        <label class="role-label">@role.Name</label>
+                    </div>
+                }
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-danger confirm">CREATE</button> <br />
+            </div>
+        </form>
+    </div>
+</div>
+
+    <div>
+        <a class="btn btn-danger confirm" asp-action="Index">Back to List</a>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#PositionId").change(function () {
+                var selectedPositionId = $(this).val();
+                var supervisorField = $("#supervisorField");
+                var supervisorDropdown = $("#SupperVisorId");
+                var ceoId = @ViewBag.CEOId;
+
+
+                $.ajax({
+                    url: "/Employee/GetSupervisors",
+                    data: { positionId: selectedPositionId },
+                    success: function (data) {
+                        console.log(data);
+
+                        var supervisorDropdown = $("#SupperVisorId");
+                        supervisorDropdown.empty();
+
+                        supervisorDropdown.append($('<option>', {
+                            value: '',
+                            text: 'Select Supervisor'
+                        }));
+
+                        $.each(data.svisor, function (index, supervisor) {
+                            supervisorDropdown.append($('<option>', {
+                                value: supervisor.id,
+                                text: supervisor.fullName
+                            }));
+                        });
+                        // if CEO dont need suppervisorId
+                        if (selectedPositionId == ceoId) {
+                            supervisorDropdown.removeAttr('required');
+                        } else {
+                            supervisorDropdown.prop('required', true);
+                        }
+                    }
+                });
+            });
+        });
+
+    </script>
+<script>
+
+    // Validate name
+    $(document).ready(function () {
+        $('#name').blur(function (event) {
+            var name = $(this).val();
+            //  check name is required
+            if (!name) {
+                $('#name-error').html('Name required');
+                $("#name-error").css("color", "red");
+                //  check do dai cua name>3
+            } else if (name.length < 3) {
+                $('#name-error').html('Name must be at least 3 characters long.');
+                $("#name-error").css("color", "red");
+            }
+
+            else {
+                $("#name-error").html("You can use this Name");
+                $("#name-error").css("color", "blue");
+            }
+        });
+    });
+
+
+    // Validate email format
+    $(document).ready(function () {
+        $('#email').blur(function (event) {
+            var email = $(this).val();
+
+           var emailRegex = /^[^\s]+[^\s]+\.[^\s]+$/;
+            if (!emailRegex.test(email)) {
+                $('#email-error').html('Email is required Or Invalid email format.');
+                $("#email-error").css("color", "red");
+            }
+            // Validate if email is already taken
+            else {
+                $.ajax({
+                    url: '@Url.Action("CheckEmail", "Employee")',
+                    type: 'GET',
+                    data: { email: email },
+                    success: function (response) {
+
+                        if (response.exists) {
+                            $('#email-error').html('This email is already taken.');
+                            $("#email-error").css("color", "red");
+                        }
+                        else {
+                            $('#email-error').html('You can use this email.');
+                            $("#email-error").css("color", "blue");
+                        }
+                    },
+                });
+            }
+        });
+        // Validate password
+        $(document).ready(function () {
+            $('#password').blur(function (event) {
+                var password = $(this).val();
+
+                //  check name is required
+                //  check do dai cua name>3
+                if (!password || password.length < 6 || !hasNumber(password)) {
+                    $('#password-error').html('Password must be at least 6 characters long and at least one number');
+                    $("#password-error").css("color", "red");
+                }
+
+                else {
+                    $("#password-error").html("You can use this Password");
+                    $("#password-error").css("color", "blue");
+                }
+            });
+        });
+        function hasNumber(str) {
+            return /\d/.test(str);
+        }
+
+        $(document).ready(function () {
+            $('#password_confirmation').blur(function (event) {
+                var password = $('#password').val();
+                var confirmPassword = $(this).val();
+                if (password != confirmPassword) {
+                    $('#confirm-password-error').html('Passwords do not match.');
+                    $("#confirm-password-error").css("color", "red");
+                } else {
+                    $('#confirm-password-error').html('');
+                }
+            });
+        });
+    });
+
+</script>

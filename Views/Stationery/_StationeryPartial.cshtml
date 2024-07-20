@@ -1,0 +1,51 @@
+﻿<!-- _RequestTablePartial.cshtml -->
+@using Microsoft.AspNetCore.Http
+
+@inject IHttpContextAccessor HttpContextAccessor
+@model IEnumerable<Group5.ViewModels.StationeryItemViewModel>
+
+<table class="table table-cl" id="StationeryItem">
+
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Id)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+
+                <td>
+                    $@Html.DisplayFor(modelItem => item.Price)
+                </td>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.Categories!.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Brand!.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Quantity)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TypeOfQuantity)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CreatedAt)
+                </td>
+                <td style="max-width:900px">
+                    @* @Html.ActionLink("Edit", "EditStationery", new {  id=item.Id }) | *@
+                    <a asp-action="EditStationery" asp-route-id="@item.Id" class="btn btn-success">Edit</a> |
+                    <a asp-action="DetailSta" asp-route-id="@item.Id" class="btn btn-info">Detail</a> |
+
+                    @* @Html.ActionLink("Delete", "DeleteStationery", new {  id=item.Id  }) *@
+                    <a asp-action="DeleteStationery" asp-route-id="@item.Id" class="btn btn-danger" onclick="return confirm('Are you sure you want to hide this item?')">Hide</a>
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

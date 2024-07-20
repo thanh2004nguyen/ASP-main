@@ -1,0 +1,302 @@
+﻿@model Group5.Models.NewStationeryRequest
+
+@using Group5.Data
+@{
+    ViewData["Title"] = "RequestDetail";
+
+
+}
+<head>
+    <style>
+
+        .reject {
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: cadetblue;
+            color: black;
+            text-decoration: none;
+            border: 1px solid yellow;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+            .reject:hover {
+                background-color: red;
+                color: white;
+                border-color: red;
+            }
+
+
+        .approve {
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: #166D9A;
+            color: black;
+            text-decoration: none;
+            border: 1px solid yellow;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+            .approve:hover {
+                background-color: Green;
+                color: white;
+                border-color: green;
+            }
+
+
+        .list-group-item.active {
+            background: #ffc107;
+        }
+        /* end common class */
+        .top-status ul {
+            list-style: none;
+            display: flex;
+            justify-content: space-around;
+            justify-content: center;
+            flex-wrap: wrap;
+            padding: 0;
+            margin: 0;
+        }
+
+            .top-status ul li {
+                width: 120px;
+                height: 120px;
+                border-radius: 50%;
+                background: #fff;
+                display: flex;
+                justify-content: center;
+                flex-direction: column;
+                align-items: center;
+                border: 8px solid #ddd;
+                box-shadow: 1px 1px 10px 1px #ddd inset;
+                margin: 10px 5px;
+            }
+
+                .top-status ul li.active {
+                    border-color: #ffc107;
+                    box-shadow: 1px 1px 20px 1px #ffc107 inset;
+                }
+        /* end top status */
+
+        ul.timeline {
+            list-style-type: none;
+            position: relative;
+        }
+
+            ul.timeline:before {
+                content: ' ';
+                background: #d4d9df;
+                display: inline-block;
+                position: absolute;
+                left: 29px;
+                width: 2px;
+                height: 100%;
+                z-index: 400;
+            }
+
+            ul.timeline > li {
+                margin: 20px 0;
+                padding-left: 30px;
+            }
+
+                ul.timeline > li:before {
+                    content: '\2713';
+                    background: #fff;
+                    display: inline-block;
+                    position: absolute;
+                    border-radius: 50%;
+                    border: 0;
+                    left: 5px;
+                    width: 50px;
+                    height: 50px;
+                    z-index: 400;
+                    text-align: center;
+                    line-height: 50px;
+                    color: #d4d9df;
+                    font-size: 24px;
+                    border: 2px solid #d4d9df;
+                }
+
+                ul.timeline > li.active:before {
+                    content: '\2713';
+                    background: #28a745;
+                    display: inline-block;
+                    position: absolute;
+                    border-radius: 50%;
+                    border: 0;
+                    left: 5px;
+                    width: 50px;
+                    height: 50px;
+                    z-index: 400;
+                    text-align: center;
+                    line-height: 50px;
+                    color: #fff;
+                    font-size: 30px;
+                    border: 2px solid #28a745;
+                }
+
+        .product-des
+        {
+            color: darkblue;
+            font-size: 15px;
+            font-weight:bold
+        }
+    </style>
+
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <link rel="stylesheet" href="~/css/Tracking.css">
+  @*   <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script> *@
+    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+</head>
+
+<body>
+    <section class="my-5">
+        <div class="container">
+            <div class="main-body">
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="card">
+                            <div style="font-size:35px;text-align:center;color:cadetblue">SUBMITED BY</div>
+                            <div class="card-body">
+                                <div class="d-flex flex-column align-items-center text-center">
+                                    <img src="~/images/@Model.RequestBy?.Avatar" alt="image"
+                                         class="rounded-circle p-1 bg-warning" width="110">
+                                    <div class="mt-3">
+                                        <h4>@Model.RequestBy?.FullName</h4>
+                                        <p class="text-secondary mb-1">@Model.RequestBy?.Departments?.Name</p>
+                                        <p class="text-muted font-size-sm">@Model.RequestBy?.EmployeePositions?.Position</p>
+                                    </div>
+                                </div>
+                                <div class="list-group list-group-flush text-center mt-4">
+                                    <a href="#" class="list-group-item list-group-item-action border-0 active">
+                                        Profile Informaton
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-8">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="top-status">
+                                    <h5>REQUEST# @Model.Id</h5>
+                                    <div class="d-flex flex-row align-items-center">
+                                        <img src="~/images/@Model.Image" alt="image" class="rounded-circle p-1 bg-warning" width="220">
+                                        <div class="ml-4">
+                                            <h3 style="color:indianred">Item Name: @Model.ItemName</h3>
+                                            <p class="product-des">Request Time: @Model.CreatedAt</p>
+                                            <p class="product-des">Quantity: @Model.Quantity</p>
+                                            <p class="product-des">Price: $@Model.Price</p>
+                                            <p class="product-des">Total: $@Model.Total</p>  
+                                            <p class="product-des">Description: @Model.Description</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card mt-4">
+
+                            <div class="card-body p-0 table-responsive">
+                         
+                          
+                                @if (Model.RequestStatus?.Status == "Canceling! Wait For Approval")
+                                {
+                                    <span style="font-size:14px;font-weight:bold;color:darkslateblue">SUBMITER WANT TO CANCEL THIS REQUEST! DO YOU AGREE OR NOT?</span>
+                                    <a asp-action="rejectcancel" asp-controller="Request" asp-route-id="@Model.Id" class="btn btn-danger">REJECT</a>
+                                    <a asp-action="approvecancel" asp-controller="Request" asp-route-id="@Model.Id" class="btn btn-success">APPROVE</a>
+                                }
+                                else if (Model.RequestStatus?.Status == "Wait For Approvement")
+                                {
+                                    <button id="rejectButton" data-action="reject" data-controller="Request" data-route-id="@Model.Id" class="btn btn-danger">REJECT</button>
+                                    <a asp-action="approve" asp-controller="Request" asp-route-id="@Model.Id" class="btn btn-success">APPROVE</a>
+                                }
+                                else
+                                {
+                                    <a asp-action="ListReceivedRequest" asp-controller="Request" class="btn btn-success">Done! Go Back</a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+
+    </section>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous"></script>
+
+</body>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+
+<script>
+ 
+    $(document).ready(function () {
+        $("#rejectButton").on("click", function () {
+            var action = $(this).data("action");
+            var controller = $(this).data("controller");
+            var routeId = $(this).data("route-id");
+
+            // Display a SweetAlert prompt to get the reject reason
+            Swal.fire({
+                title: "Reject This Request!",
+                text: "Please provide a reason for rejection:",
+                input: 'text',
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Reject"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    var rejectReason = result.value;
+                    if (rejectReason) {
+
+                        $("#RejectReason").val(rejectReason);
+                        $.ajax({
+                            url: "/" + controller + "/" + action + "/" + routeId,
+                            method: "GET",
+                            data: { rejectReason: rejectReason },
+                            success: function (data) {
+                                // Handle success if needed
+                                console.log("Action performed successfully");
+                                location.reload();
+                            },
+                            error: function (error) {
+                                // Handle error if needed
+                                console.error("Error performing action: ", error);
+                            }
+                        });
+                    } else {
+                        // User did not provide a reason, handle it accordingly
+                        Swal.fire("Rejection reason is required.", "", "error");
+                    }
+                }
+            });
+        });
+    });
+</script>
+
+
+
+  
+
+
+

@@ -1,0 +1,209 @@
+﻿@model Group5.ViewModels.EmployeeViewModel
+
+@{
+    ViewData["Title"] = "Update";
+}
+
+
+<style>
+
+    h1 {
+        color: green;
+    }
+
+    hr {
+        border-color: white;
+    }
+
+    .row {
+        margin: 20px;
+    }
+
+    form {
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        color: black;
+    }
+
+    input,
+    select,
+    button {
+        width: 100%;
+        padding: 10px;
+        margin-top: 5px;
+        margin-bottom: 15px;
+        box-sizing: border-box;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    button {
+        background-color: green;
+        color: white;
+        cursor: pointer;
+    }
+
+    .form-check {
+        display: flex;
+        align-items: center;
+    }
+
+    .form-check-input {
+        margin-right: 5px;
+    }
+
+    a {
+        color: white;
+    }
+
+    .role-container {
+        margin-bottom: 20px;
+    }
+
+    .role-checkbox {
+        display: flex;
+        width: 50%;
+        float: left;
+        margin-bottom: 10px;
+    }
+
+        .role-checkbox input {
+            margin-right: 5px;
+            width: 50%;
+            float: left;
+        }
+
+    .role-label {
+        color: black;
+    }
+</style>
+
+
+
+
+
+
+
+
+
+<h1 style="text-align:center">Update Employee</h1>
+
+<div class="row" style="display:flex;justify-content:space-between;align-items:center">
+    <div class="col-md-4">
+        <form asp-action="Update">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <input asp-for="Id" class="form-control" hidden />
+            </div>
+
+            <div class="form-group">
+                <label asp-for="FullName" class="control-label"></label>
+                <input asp-for="FullName" class="form-control" readonly />
+                <span asp-validation-for="FullName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Email" class="control-label"></label>
+                <input asp-for="Email" class="form-control" required />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Password" hidden class="control-label"></label>
+                <input asp-for="Password" class="form-control" hidden />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            <div class="form-group" hidden>
+                <input asp-for="Avatar" name="Avatar" class="form-control" hidden />
+                <label asp-for="Avatar" class="control-label"></label>
+                <td>
+
+                    <img src="/images/@Model.Avatar" style="height:250px;width:250px" />
+
+
+                </td>
+                <span asp-validation-for="Avatar" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DepartmentId" class="control-label"></label>
+                <select asp-for="DepartmentId" asp-items="@ViewBag.DepartName" class="form-control"></select>
+                <span asp-validation-for="DepartmentId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="EmployeePositionId" class="control-label"></label>
+                <select asp-for="EmployeePositionId" asp-items="@ViewBag.PositionName" class="form-control" id="PositionId"></select>
+                <span asp-validation-for="EmployeePositionId" class="text-danger"></span>
+            </div>
+
+            <input asp-for="AmountRequestPerMonth" hidden/>
+            <input asp-for="ResetAmountTime" hidden />
+
+            <div class="form-group">
+                <label asp-for="SupperVisorId" class="control-label"></label>
+                <select asp-for="SupperVisorId" asp-items="@ViewBag.SupperVisorOptions" class="form-control" id="SupperVisorId"></select>
+                <span asp-validation-for="SupperVisorId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group role-container">
+                <label>Role</label>
+                @foreach (var i in ViewBag.RoleName.Items)
+                {
+                    var isChecked = Model.EmployeeRoles != null && Model.EmployeeRoles.Any(a => a.RoleId == i.Id);
+                    <div class="role-checkbox form-check">
+                        <input type="checkbox" class="form-check-input" name="ListRoles" value="@i.Id" @(isChecked ? "checked" : "")>
+                        <label class="role-label form-check-label">@i.Name</label>
+                    </div>
+                }
+
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary btn-danger confirm">Update</button> <br />
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("#PositionId").change(function () {
+            var selectedPositionId = $(this).val();
+
+            // Make an AJAX request to the server to get supervisors based on the selected position
+            $.ajax({
+                url: "/Employee/GetSupervisors", // Replace with your actual controller and action
+                data: { positionId: selectedPositionId },
+                success: function (data) {
+                    console.log(data);
+                    // Clear and populate the SupperVisorId dropdown with the retrieved data
+                    var supervisorDropdown = $("#SupperVisorId");
+                    supervisorDropdown.empty();
+
+                    // Add the default option or handle it as needed
+                    supervisorDropdown.append($('<option>', {
+                        value: '',
+                        text: 'Select Supervisor'
+                    }));
+
+                    // Populate the dropdown with supervisor data
+                    $.each(data.svisor, function (index, supervisor) {
+                        supervisorDropdown.append($('<option>', {
+                            value: supervisor.id,
+                            text: supervisor.fullName
+                        }));
+                    });
+                }
+            });
+        });
+    });
+</script>

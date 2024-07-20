@@ -1,0 +1,296 @@
+﻿@model Group5.ViewModels.IndexViewModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<style>
+  
+
+    .rooms li {
+    display: flex; /* Use flexbox */
+    align-items: center; /* Vertically center items within the flex container */
+}
+
+    .outOfStock {
+        font-size:80px;
+       background-color: blue;
+        font-weight: bold;
+    }
+
+   
+    .rooms li.active a {
+        background-color: #ffcc00; /* Change this to the background color you want for the active room */
+        color: #000; /* Change this to the text color you want for the active room */
+    }
+
+</style>
+
+<h1>Chat Support Management</h1>
+
+<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+<link rel="stylesheet" href="~/css/site.css" />
+<link rel="stylesheet" href="~/css/adminchat.css" />
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.1/knockout-min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+<div class="alert alert-warning alert-dismissible d-none" id="errorAlert" role="alert">
+    <span data-bind="text:serverInfoMessage"></span>
+    <button type="button" class="btn-close" aria-label="Close"></button>
+</div>
+
+<div class="d-flex flex-column justify-content-center align-items-center vh-100" data-bind="css: isLoading() ? 'd-flex' : 'd-none'">
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
+
+<div class="app d-none" data-bind="css: isLoading() ? 'd-none' : ''">
+    <div class="sidebar-chat" style="background-color:mediumseagreen;width:320px">
+        <div class="header">
+            <h5>List User</h5>
+            <div class="actions">
+             @*    <a role="button" id="create-room" data-bs-toggle="modal" data-bs-target="#create-room-modal">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus-circle"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                </a> *@
+                <a role="button" class="ms-3" id="expand-users-list">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-users"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                </a>
+                <a role="button" id="expand-sidebar">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                </a>
+            </div>
+        </div>
+
+        <ul class="rooms list-unstyled" id="rooms-list" data-bind="foreach: chatRooms" hidden >
+            <li>
+                <a href="#" data-bind="text: name, attr: { 'data-roomId': id }, click: $parent.joinRoom.bind($data), css: { active: $root.joinedRoom()?.name() == name() }"></a>
+            </li>
+        </ul>
+
+      <!-- Second room list -->
+        <ul class="rooms list-unstyled-1" id="rooms-list-1">
+            @foreach (var room in Model!.Rooms!)
+            {
+                <li>
+                    <button style="width:90px;display:none" class="btn btn-warning warning-icon-notika btn-reco-mg btn-button-mg waves-effect unseen-indicator flickering-icon" data-roomId="@room.Id" ><i class="fa-solid fa-message fa-beat">Message</i></button>
+                    <a style="font-size:17px;color:black" data-roomId="@room.Id" href="#" onclick="handleRoomClick(this)">@room.Name</a>
+                </li>
+            }
+        </ul>
+    </div>
+    <div class="main-content" data-bind="visible: joinedRoom() == null">
+        <span class="m-auto">Please select room to join!</span>
+    </div>
+    <div class="main-content" data-bind="visible: joinedRoom() != null">
+        <div class="header">
+            <h5 id="joinedRoom" data-bind="text: joinedRoom()?.name()">Lobby</h5>
+            <div class="room-actions" data-bind="visible: showRoomActions()">
+                <button type="button" class="btn btn-link text-secondary px-1" data-bs-toggle="modal" data-bs-target="#rename-room-modal">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit-3"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                </button>
+                <button type="button" class="btn btn-link text-secondary px-1" data-bs-toggle="modal" data-bs-target="#remove-room-modal">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+        </div>
+        <div class="messages-container position-relative">
+            <div class="no-messages-info" data-bind="if: chatMessages().length == 0">There are no messages.</div>
+            <ul class="list-unstyled" id="messages-list" data-bind="foreach: chatMessages">
+                <li>
+                    <div class="message-item" data-bind="css: { ismine: isMine() === true }">
+                        <span class="avatar avatar-lg mx-2 text-uppercase" data-bind="visible: avatar() == null, text: fromFullName()[0]"></span>
+                        <img class="avatar avatar-lg mx-2" data-bind="visible: avatar() != null, attr: { src: avatar() != null ? '/images/' + avatar() : '' }" />
+                        <div class="message-content">
+                            <div class="message-info d-flex flex-wrap align-items-center">
+                                <span class="author" data-bind="text: fromFullName"></span>
+                                <span class="timestamp" data-bind="text: timestampRelative, attr: { 'data-bs-title': timestampFull }" data-bs-toggle="tooltip" data-bs-placement="top"></span>
+                            </div>
+                            <div class="content" data-bind="html: content"></div>
+                        </div>
+                        <div class="actions d-none">
+                            <div class="dropdown dropstart">
+                                <a class="text-secondary" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-vertical"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a class="dropdown-item" href="#" data-bind="attr: { 'data-messageId': id }" data-bs-toggle="modal" data-bs-target="#remove-message-modal">Delete</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="message-input-container">
+            <input id="message-input" type="text" value="" maxlength="500" data-bind="value:message, valueUpdate: 'afterkeydown', event: { keypress: onEnter }" placeholder="What's on your mind?" />
+            <div class="actions d-flex align-items-center">
+                <form method="post" asp-action="Upload" asp-controller="Upload" enctype="multipart/form-data" id="uploadForm">
+                    <label for="UploadedFile" class="custom-file-upload">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-image"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                    </label>
+                    <input type="hidden" name="RoomId" data-bind="value: joinedRoom()?.id()" />
+                    <input type="file" id="UploadedFile" name="File" accept=".jpg,.jpeg,.png" data-bind="event: {change: uploadFiles}">
+                </form>
+                <a role="button" id="btn-show-emojis">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-smile"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg>
+                </a>
+                <a role="button" id="btn-send-message" data-bind="click: sendNewMessage">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-send"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                </a>
+            </div>
+            <div class="emojis-container d-none" id="emojis-container">
+                <button data-value=":)">
+                    <img src="~/images/emojis/emoji1.png" />
+                </button>
+                <button data-value=":P">
+                    <img src="~/images/emojis/emoji2.png" />
+                </button>
+                <button data-value=":O">
+                    <img src="~/images/emojis/emoji3.png" />
+                </button>
+                <button data-value=":-)">
+                    <img src="~/images/emojis/emoji4.png" />
+                </button>
+                <button data-value="B|">
+                    <img src="~/images/emojis/emoji5.png" />
+                </button>
+                <button data-value=":D">
+                    <img src="~/images/emojis/emoji6.png" />
+                </button>
+                <button data-value="<3">
+                    <img src="~/images/emojis/emoji7.png" />
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="users-container">
+        <div class="header">
+            <h5>Who's Here (<span data-bind="text: filteredChatUsers().length">0</span>)</h5>
+        </div>
+        <ul class="list-unstyled flex-grow-1" id="users-list" data-bind="foreach: filteredChatUsers">
+            <li data-bind="attr: { 'data-username': userName }">
+                <div class="user">
+                    <span class="avatar me-2 text-uppercase" data-bind="visible: avatar() == null, text: fullName()[0]"></span>
+                    <img class="avatar me-2" data-bind="visible: avatar() != null, attr: { src: avatar() != null ? '/images/' + avatar() : '' }" />
+                    <div class="user-info">
+                        <span class="name" data-bind="text: fullName"></span>
+                        <span class="device" data-bind="text: device"></span>
+                    </div>
+                </div>
+            </li>
+        </ul>
+        <div class="position-relative search-container text-secondary">
+            <input type="text" class="" placeholder="Search" data-bind="value: filter, valueUpdate: 'afterkeydown'" />
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="create-room-modal" tabindex="-1" aria-labelledby="createRoomModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createRoomModalLabel">Create Room</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="text" class="form-control" id="roomName" maxlength="100" placeholder="Enter room name..." />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-sm btn-primary" data-bs-dismiss="modal" data-bind="click: createRoom">Create</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<script>
+    function joinRoomAndTriggerClick(element) {
+        // Extract data-roomId attribute from the clicked anchor
+        var roomId = element.getAttribute('data-roomId');
+
+        // Find the corresponding element in the first list and trigger a click event
+        var firstListAnchor = document.querySelector('#rooms-list a[data-roomId="' + roomId + '"]');
+        if (firstListAnchor) {
+            firstListAnchor.click();
+        }
+    }
+</script>
+
+
+<script>
+    // Function to handle room clicks
+    function handleRoomClick(link) {
+        // Remove 'active' class from all li elements
+        document.querySelectorAll('.rooms li').forEach(li => li.classList.remove('active'));
+
+        // Toggle 'active' class on the clicked li element
+        link.parentNode.classList.toggle('active');
+
+        // Add your logic here to handle the click, e.g., join the room
+        joinRoomAndTriggerClick(link);
+    }
+</script>
+
+<script>
+    function updateUnseenMessages() {
+        fetch('/AdminChat/CheckUnseenMessages')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Check if the data has the expected structure
+                if (data && Array.isArray(data.unseenMessages)) {
+                    // Handle the returned JSON data
+                    console.log('UnseenMessages updated:', data);
+
+                    // Iterate through the rooms in the second list
+                    document.querySelectorAll('#rooms-list-1 li').forEach(li => {
+                        const roomId = li.querySelector('a').getAttribute('data-roomId');
+                        const unseenSpan = li.querySelector('.unseen-indicator');
+
+                        // Check if the room has unseen messages
+                        const hasUnseenMessages = data.unseenMessages.some(message => message.toRoomId == roomId);
+                        console.log('UnseenMessages updated222222222:', hasUnseenMessages);
+                        console.log('UnseenMessages updated222222222:', roomId);
+                        // Update the UI based on the presence of unseen messages
+                        if (hasUnseenMessages) {
+                            unseenSpan.style.display = 'inline'; // Display the indicator
+                        } else {
+                            unseenSpan.style.display = 'none'; // Hide the indicator
+                        }
+                    });
+                } else {
+                    console.error('Unexpected data format:', data);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching UnseenMessages:', error);
+            });
+    }
+
+    // Call the function every 5 seconds
+    setInterval(updateUnseenMessages, 5000);
+</script>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script type='text/javascript' src='knockout-3.5.1.js'></script>
+<script src="~/lib/knockout/knockout-latest.min.js"></script>
+<script src="~/lib/microsoft-signalr/signalr.min.js"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
+<script src="~/js/chat.js" asp-append-version="true"></script>

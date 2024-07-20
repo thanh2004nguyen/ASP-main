@@ -1,0 +1,139 @@
+﻿@model IEnumerable<Group5.Models.Base.RequestBase>
+
+@{
+    ViewData["Title"] = "Approved Request";
+
+}
+
+<h1 style="text-align:center">List Approved Request</h1>
+<div style="text-align:center">
+    <button class="btn btn-danger" style="width:200px;height:40px;font-size:18px;color:darkslateblue;font-weight:bold" id="approvedBtn">Approved</button>
+    <button class="btn btn-danger" style="width:200px;height:40px;font-size:18px;color:darkslateblue;font-weight:bold" id="inProgressBtn">In Progress</button>
+    <button class="btn btn-danger" style="width:200px;height:40px;font-size:18px;color:darkslateblue;font-weight:bold" id="sendingBtn">Sending</button>
+    <button class="btn btn-danger" style="width:200px;height:40px;font-size:18px;color:darkslateblue;font-weight:bold" id="completedBtn">Completed</button>
+
+    <button class="btn btn-danger" style="width:200px;height:40px;font-size:18px;color:darkslateblue;font-weight:bold" id="cancelBtn">Canceling</button>
+</div>
+
+<table class="table table-cl" id="ApprovedRequest">
+    <thead>
+        <tr>
+            <th class="active">
+                @Html.DisplayNameFor(model => model.Id)
+            </th>
+            <th class="active">
+                @Html.DisplayNameFor(model => model.CreatedAt)
+            </th>
+            <th class="active">
+                Request By
+            </th>
+
+            <th class="active">
+                @Html.DisplayNameFor(model => model.Total)
+            </th>
+            <th class="active">
+                Status
+            </th>
+            <th class="active">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Id)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CreatedAt)
+                </td>
+                <td>
+                    <img src="~/images/@item.RequestBy?.Avatar" style="width:40px ; height:60px">
+                    @Html.DisplayFor(modelItem => item.RequestBy!.FullName)
+                </td>
+                <td>
+                    $@Html.DisplayFor(modelItem => item.Total)
+                </td>
+                <td>
+
+                    @if (@item.RequestStatus?.Status == "Approved")
+                    {
+                        <a class="btn btn-success">@item.RequestStatus?.Status</a>
+                    }
+                    else if (@item.RequestStatus?.Status == "Completed")
+                    {
+                        <a class="btn btn-primary">@item.RequestStatus?.Status</a>
+                    }
+                    else
+                    {
+                        <a class="btn btn-info">@item.RequestStatus?.Status</a>
+                    }
+
+
+                </td>
+                <td>
+                    @if(item.Id<999990)
+                    {
+                        <a asp-action="ApprovedRequestDetail" asp-controller="Request" asp-route-id="@item.Id">
+                            <button class="btn btn-danger lightgreen-icon-notika btn-reco-mg btn-button-mg"><i class="notika-icon notika-menus"></i>SEE DETAIL</button>
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-action="ApprovedNewRequestDetail" asp-controller="Request" asp-route-id="@item.Id">
+                            <button class="btn btn-danger lightgreen-icon-notika btn-reco-mg btn-button-mg"><i class="notika-icon notika-menus"></i>SEE DETAIL</button>
+                        </a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // Function to load data using AJAX
+        function loadData(requestType) {
+            $.ajax({
+                url: '@Url.Action("GetRequestsByType", "Request")',
+                type: 'GET',
+                data: { type: requestType },
+                success: function (data) {
+                    
+                    $('#ApprovedRequest tbody').html(data);
+                },
+                error: function () {
+                    alert('Error loading data.');
+                }
+            });
+        }
+
+        // Click event for Approved button
+        $('#approvedBtn').click(function () {
+            loadData('Approved');
+        });
+
+        // Click event for InProgress button
+        $('#inProgressBtn').click(function () {
+            loadData('InProgress');
+        });
+
+        // Click event for Sending button
+        $('#sendingBtn').click(function () {
+            loadData('Sending');
+        });
+
+        // Click event for Completed button
+        $('#completedBtn').click(function () {
+            loadData('Completed');
+        });
+
+        $('#cancelBtn').click(function () {
+            loadData('Cancel');
+        });
+
+    });
+</script>
+
+cancelBtn

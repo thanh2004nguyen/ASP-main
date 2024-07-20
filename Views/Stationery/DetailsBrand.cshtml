@@ -1,0 +1,108 @@
+﻿@model IEnumerable<Group5.Models.StationeryItem>
+
+@{
+    ViewData["Title"] = "DetailsBrand";
+}
+
+@if (TempData.ContainsKey("message"))
+{
+    <div class="alert alert-success" style="font-size:25px">
+        @TempData["message"]
+    </div>
+}
+@if (TempData.ContainsKey("success"))
+{
+    <div class="alert alert-success">
+        @TempData["success"]
+    </div>
+}
+
+@if (TempData.ContainsKey("error"))
+{
+    <div class="alert alert-danger">
+        @TempData["error"]
+    </div>
+}
+<h1 style="text-align:center">Stationery Brand</h1>
+
+<table class="table table-cl" id="detailbrand">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            @* <th>
+                @Html.DisplayNameFor(model => model.Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Price)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ImageUrl)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Quantity)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TypeOfQuantity)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Categories)
+            </th> *@
+            <th>
+                @* @Html.DisplayNameFor(model => model.ImageUrl) *@Stationery Image
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Brand)
+            </th>
+           @*  <th>
+                Create Date
+            </th> *@
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+           @*  <td>
+                @Html.DisplayFor(modelItem => item.Description)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Price)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ImageUrl)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Quantity)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TypeOfQuantity)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Categories.Id)
+            </td> *@
+            <td>
+                    <img src="~/images/@item.ImageUrl" style="max-width:70px">
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Brand.Name)
+            </td>
+            @* <td>            
+                    @Html.DisplayFor(modelItem => item.CreatedAt)
+            </td> *@
+            <td>
+                    <a asp-action="EditStationery" asp-route-id="@item.Id" class="btn btn-success">Edit</a> |
+                    <a asp-action="DetailSta" asp-route-id="@item.Id" class="btn btn-info">Details</a> |
+                    <a asp-action="DeleteStationery" asp-route-id="@item.Id" class="btn btn-danger" onclick="return confirm('Are you sure you want to hide this item?')">Hide</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+<div>
+    <a asp-action="Brand" class="btn btn-danger confirm">Back to List</a>
+</div>

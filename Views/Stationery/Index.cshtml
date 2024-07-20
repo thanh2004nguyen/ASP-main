@@ -1,0 +1,150 @@
+﻿@using Microsoft.AspNetCore.Http
+
+@inject IHttpContextAccessor HttpContextAccessor
+
+@model IEnumerable<Group5.ViewModels.StationeryItemViewModel>
+
+@{
+    ViewData["Title"] = "Index";
+    var total = ViewData["total"];
+}
+
+@if (TempData.ContainsKey("success"))
+{
+    <div class="alert alert-success" style="font-size:25px">
+        @TempData["success"]
+    </div>
+}
+
+@if (TempData.ContainsKey("error"))
+{
+    <div class="alert alert-danger">
+        @TempData["error"]
+    </div>
+}
+@if (TempData.ContainsKey("message"))
+{
+    <div class="alert alert-danger">
+        @TempData["message"]
+    </div>
+}
+<h2 style="text-align:center">Fillter By Category</h2>
+<div style="text-align:center">
+    <!-- Dynamically generate buttons for each category -->
+    @foreach (var category in ViewBag.Categories)
+    {
+        <button class="btn btn-primary categoryBtn" style="width:150px;height:40px;font-size:18px;color:darkslateblue;font-weight:bold"  data-category="@category">@category</button>
+    }
+</div>
+<h3 style="text-align:center">Stationery List</h3>
+<table class="table table-cl" id="StationeryItem">
+    <thead>
+        <tr>
+            <th class="active">
+                @Html.DisplayNameFor(model => model.Id)
+            </th>
+            <th class="active">
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            @* <th class="active">
+                @Html.DisplayNameFor(model => model.Description)
+            </th> *@
+            <th class="active">
+                @Html.DisplayNameFor(model => model.Price)
+            </th>
+            @* <th class="active">
+                @Html.DisplayNameFor(model => model.ImageUrl)
+            </th> *@
+            <th class="active">
+                Category
+            </th>
+            <th class="active">
+                Brand
+            </th>
+            <th class="active">
+                Quantity
+            </th>
+
+            <th class="active">
+                Type Of Stationery
+            </th>
+            <th class="active">
+                Create Date
+            </th>
+            <th class="active" style="max-width:500px">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr >
+                <td>
+                    @Html.DisplayFor(modelItem => item.Id)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+ 
+                <td>
+                   $@Html.DisplayFor(modelItem => item.Price)
+                </td>
+      
+                <td>
+                    @Html.DisplayFor(modelItem => item.Categories!.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Brand!.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Quantity)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TypeOfQuantity)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CreatedAt)
+                </td>
+                <td style="max-width:900px">
+                    @* @Html.ActionLink("Edit", "EditStationery", new {  id=item.Id }) | *@
+                    <a asp-action="EditStationery" asp-route-id="@item.Id" class="btn btn-success">Edit</a> |
+                    <a asp-action="DetailSta" asp-route-id="@item.Id" class="btn btn-info">Detail</a> |
+
+                    @* @Html.ActionLink("Delete", "DeleteStationery", new {  id=item.Id  }) *@
+                    <a asp-action="DeleteStationery" asp-route-id="@item.Id" class="btn btn-danger" onclick="return confirm('Are you sure you want to hide this item?')">Hide</a>
+
+            </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // Function to load data using AJAX
+        function loadDataByCategory(category) {
+            $.ajax({
+                url: '@Url.Action("GetStationeryByCategory", "Stationery")',
+                type: 'GET',
+                data: { category: category },
+                success: function (data) {
+                    console.log(data);
+
+                    $('#StationeryItem tbody').html(data);
+                },
+                error: function () {
+                    alert('Error loading data.');
+                }
+            });
+        }
+        $(document).on('click', '.categoryBtn', function () {
+            var category = $(this).data('category');
+            loadDataByCategory(category);
+        });
+    });
+</script>
+
+
+
+

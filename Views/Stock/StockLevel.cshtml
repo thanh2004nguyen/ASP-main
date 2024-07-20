@@ -1,0 +1,74 @@
+﻿@model IEnumerable<Group5.Models.StockLevel>
+
+@{
+    ViewData["Title"] = "StockLevel";
+}
+
+@if (TempData.ContainsKey("success"))
+{
+	<div class="alert alert-success" style="font-size:25px">
+		@TempData["success"]
+	</div>
+}
+
+@if (TempData.ContainsKey("error"))
+{
+	<div class="alert alert-danger">
+		@TempData["error"]
+	</div>
+}
+@if (TempData.ContainsKey("message"))
+{
+	<div class="alert alert-danger">
+		@TempData["message"]
+	</div>
+}
+
+										
+<p>
+    <a class="btn btn-danger confirm" style="width:220px;height:45px;font-size:20px" asp-action="CreateStockLevel">Create New</a>
+</p>
+<h1 style="text-align:center">List StockLevel</h1>
+<div class="row" style="display:flex;justify-content:space-between;align-items:center">
+
+    <table class="table table-cl" style="max-width:900px">
+        <thead>
+            <tr>
+                <th class="active">
+                    @Html.DisplayNameFor(model => model.Id)
+                </th>
+                <th class="active">
+                    @Html.DisplayNameFor(model => model.MinQuantity)
+                </th>
+                <th class="active" style="width:500px">
+                    @Html.DisplayNameFor(model => model.Level)
+                </th>
+                <th class="active">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Id)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.MinQuantity)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Level)
+                    </td>
+
+                    <td>
+                        <a class="btn btn-success" asp-action="UpdateStockLevel" asp-controller="Stock" asp-route-id="@item.Id" class="btn btn-info" role="button">Edit</a> ||
+                        <a class="btn btn-danger" asp-action="Delete" asp-controller="Stock" asp-route-id="@item.Id" class="btn btn-info" role="button">Delete</a>
+                      
+
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+

@@ -1,0 +1,287 @@
+﻿@using Microsoft.AspNetCore.Http
+
+@inject IHttpContextAccessor HttpContextAccessor
+
+@model IEnumerable<Group5.ViewModels.StationeryItemViewModel>
+@{
+    ViewData["Title"] = "Index";
+    var total = ViewData["total"];
+}
+
+@if (TempData.ContainsKey("success"))
+{
+    <div class="alert alert-success" style="font-size:25px">
+        @TempData["success"]
+    </div>
+}
+
+@if (TempData.ContainsKey("error"))
+{
+    <div class="alert alert-danger">
+        @TempData["error"]
+    </div>
+}
+@if (TempData.ContainsKey("message"))
+{
+    <div class="alert alert-danger">
+        @TempData["message"]
+    </div>
+} 
+<section id="mobile-products" class="product-store position-relative padding-large no-padding-top">
+    <div class="container">
+        <div class="row">
+            <div class="display-header d-flex justify-content-between pb-3">
+                <h2 class="display-7 text-dark text-uppercase">Stationery In Stock</h2>
+       
+            </div>
+            <div class="swiper product-swiper">
+                <div class="swiper-wrapper">
+                    @foreach (var item in Model)
+                    {
+                        <div class="swiper-slide">
+                            <div class="product-card position-relative">
+                                <div class="image-holder">
+                                    <img src="~/images/@item.ImageUrl" alt="product-item" class="img-fluid" style="width:300px;height:300px">
+                                </div>
+                                <div class="cart-concern position-absolute">
+                                    <div class="cart-button d-flex">
+                                        <a id="requestLink_@item.Id" data-id="@item.Id" class="ajax-add-to-cart btn btn-medium btn-black" >REQUEST</a>
+                                        <input type="number" oninput="updateLink(this, '@item.Id')" name="quantity" placeholder="Quantity" class="form-control" min="1" max="100" value="1">
+                                    </div>
+                                </div>
+                                <div class="card-detail d-flex justify-content-between align-items-baseline pt-3">
+                                    <h3 class="card-title text-uppercase">
+                                        <a href="#">@item.Name</a>
+                                    </h3> 
+                                        <span class="item-price text-primary">Stock: @item.Quantity @item.TypeOfQuantity</span>
+                                </div>
+                            </div>
+                        </div>                
+                     }
+                </div>
+            </div>
+        </div>
+    </div>
+@*     <div class="swiper-pagination position-absolute text-center"></div> *@
+</section>
+
+<h2 style="text-align:center">Fillter By Category</h2>
+<div style="text-align:center">
+    <!-- Dynamically generate buttons for each category -->
+    @foreach (var category in ViewBag.Categories)
+    {
+        <button class="btn btn-primary categoryBtn" style="width:150px;height:40px;font-size:18px;color:darkslateblue;font-weight:bold" data-category="@category">@category</button>
+    }
+
+    <!-- Brand dropdown -->
+    <select id="brandDropdown" class="form-control" style="width:150px;height:40px;font-size:18px;color:darkslateblue;font-weight:bold">
+        <option value="allbrand">All Brands</option> <!-- Optional: Provide an option to show all brands -->
+        @foreach (var brand in ViewBag.Brands)
+        {
+            <option value="@brand">@brand</option>
+        }
+    </select>
+</div>
+<h3 style="text-align:center">Stationery List</h3>
+<table class="table table-cl" id="StationeryItem">
+    <thead>
+        <tr>
+            <th class="active">
+                @Html.DisplayNameFor(model => model.Id)
+            </th>
+            <th class="active">
+                Image
+            </th>
+
+            <th class="active">
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            @* <th class="active">
+            @Html.DisplayNameFor(model => model.Description)
+            </th> *@
+            <th class="active">
+                @Html.DisplayNameFor(model => model.Price)
+            </th>
+            <th class="active">
+                Brand
+            </th>
+            <th class="active">
+                Quantity In Stock
+            </th>
+            <th class="active" style="max-width:500px">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Id)
+                </td>
+                <td>
+                    <img src="~/images/@item.ImageUrl" style="width:80px">
+                </td>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+
+                <td>
+                    $@Html.DisplayFor(modelItem => item.Price)
+                </td>
+    
+                <td>
+                    @Html.DisplayFor(modelItem => item.Brand!.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Quantity)
+                </td>
+
+                <td style="max-width:900px">
+                    <a asp-action="DetailSta" asp-controller="Home" asp-route-id="@item.Id" class="btn btn-info">Detail</a>
+                   
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // Function to load data using AJAX
+        function loadDataByCategoryAndBrand(category, brand) {
+            $.ajax({
+                url: '@Url.Action("GetStationeryByCategory", "Home")',
+                type: 'GET',
+                data: { category: category, brand: brand },
+                success: function (data) {
+                    console.log(data);
+                    $('#StationeryItem tbody').html(data);
+                },
+                error: function () {
+                    alert('Error loading data.');
+                }
+            });
+        }
+
+        // Event handler for category buttons
+        $(document).on('click', '.categoryBtn', function () {
+            var category = $(this).data('category');
+            var brand = $('#brandDropdown').val();
+
+            loadDataByCategoryAndBrand(category, brand);
+        });
+
+        // Event handler for brand dropdown change
+        $('#brandDropdown').change(function () {
+            var category = $('.categoryBtn.active').data('category');
+            var brand = $(this).val();
+
+            loadDataByCategoryAndBrand(category, brand);
+        });
+    });
+</script>
+
+
+
+@section script
+    {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        $(document).ready(function () {
+            $(".ajax-add-to-cart").click(function () {
+                $.ajax({
+                    url: "/Cart/CreateCartItem",
+                    data: {
+                        id: $(this).data("id"),
+                        quantity: $(this).closest('.cart-button').find('input[name="quantity"]').val(),
+                        type: "ajax"
+                    },
+                    success: function (data) {
+                        console.log(data);
+                        var existingCartItem = $(".header-cart-wrapitem").find("#cartItem_" + data.newItemId);
+                        updateTotal(data.total);
+                        if (existingCartItem.length > 0) {
+                            // Update the quantity if the item is already in the cart
+                            var newQuantity = parseInt(data.newItemQuantity);
+                            existingCartItem.find(".header-cart-item-info").text(newQuantity + ' X $' + data.newItemPrice);
+                        } else {
+                            // Add a new item to the cart
+                            var newItemHtml =
+                                '<li class="header-cart-item flex-w flex-t m-b-12" id="cartItem_' + data.newItemId + '">' +
+                                '<a class="delete-cart-item-head" data-id="' + data.newItemId + '">' +
+                                '<div class="header-cart-item-img">' +
+                                '<img src="/images/' + data.newItemImage + '" alt="IMG">' + // Updated path here
+                                '</div>' +
+                                '</a>' +
+                                '<div class="header-cart-item-txt p-t-8">' +
+                                '<a class="header-cart-item-name m-b-18 hov-cl1 trans-04">' + data.newItemName + '</a>' +
+                                '<span class="header-cart-item-info">' + data.newItemQuantity + ' X $' + data.newItemPrice + '</span>' +
+                                '</div>' +
+                                '</li>';
+
+                            $(".header-cart-wrapitem").append(newItemHtml);
+                        }
+                        Swal.fire({
+                            position: "top-end",
+                            icon: "success",
+                            title: "Add Item To Request List Successfully!",
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                  
+                     
+
+                        $("#cartcount").html(data.items);
+                    },
+                    error: function () {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Can't Add to Request List",
+                            text: "Please Try Later",
+                            footer: '<a href="#">Why do I have this issue?</a>',
+                            timer: 1500
+                        });
+                    }
+                });
+                function updateTotal(total) {
+                    // Update the UI with the new total
+                    $("#total").text(total);
+                    $("#totalheader").text(total);
+                }
+            });
+        });
+    </script>
+
+    <script>
+        function updateLink(input, itemId) {
+            var quantity = input.value;
+            // Set quantity to 1 if not found or invalid
+
+            var requestLink = $("#requestLink_" + itemId);
+
+            if (quantity <= 0 || quantity > 100) {
+                requestLink.addClass("disabled");
+                requestLink.attr("disabled", true);
+            } else {
+                requestLink.removeClass("disabled");
+                requestLink.removeAttr("disabled");
+            }
+        }
+
+        $(document).ready(function () {
+            // Disable link on page load if quantity is initially invalid
+            $(".cart-button input").each(function () {
+                var itemId = $(this).data("id");
+                updateLink(this, itemId);
+            });
+
+            // Prevent default action of disabled links
+            $(".ajax-add-to-cart.disabled").on("click", function (e) {
+                e.preventDefault();
+            });
+        });
+    </script>
+}

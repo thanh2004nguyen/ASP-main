@@ -1,0 +1,70 @@
+﻿@model IEnumerable<Group5.Models.NewStationeryRequest>
+
+@{
+    ViewData["Title"] = "ListRequest";
+}
+
+<style>
+    th, td{
+        text-align:center;
+    }
+</style>
+<h1>ListRequest</h1>
+<table class="table table-cl" id="ListRequestTable">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ItemName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Quantity)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Image)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CreatedAt)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RequestStatus)
+            </th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.ItemName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Quantity)
+            </td>
+            <td>
+                <img style="width:100px;" src="~/images/@item?.StationeryItem?.ImageUrl"/>
+               
+            </td>
+                <td>
+                    @{
+                        var formattedDate = item?.CreatedAt != null ? item.CreatedAt.Value.ToString("dd/MM/yyyy") : "";
+                    }
+                    @Html.DisplayFor(modelItem => formattedDate)
+                </td>
+            <td>
+                @if (item!.RequestStatus!.Status == "In Progress")
+                {
+                        <p style="color: red; font-size: 14px">@Html.DisplayFor(modelItem => item!.RequestStatus!.Status)</p>
+                }
+                    else
+                    {
+                        <p style="color: green;font-size: 14px">@Html.DisplayFor(modelItem => item!.RequestStatus!.Status)</p>
+                    }
+            </td>
+                <td>
+                    <a asp-action="RequestDetail" asp-controller="Stock" asp-route-id="@item.Id" class="btn btn-success">Details</a>
+                    <a asp-action="DeleteRequest" asp-controller="Stock" asp-route-id="@item.Id" class="btn btn-success">Delete</a>
+                </td>
+            </tr>
+}
+    </tbody>
+</table>
